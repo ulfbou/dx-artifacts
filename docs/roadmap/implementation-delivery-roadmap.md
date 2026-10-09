@@ -10,7 +10,7 @@ Includes WP-00A. Exit evidence proves native product identity, controlling docum
 
 ## 3. Baseline boundary
 
-Includes WP-00B and WP-00C. Exit evidence proves attributed candidate import, applicable Dx.Domain and Collab evidence, classified differences, no unresolved finding, and controlling golden carrier bytes.
+Includes WP-00B and WP-00C. Exit evidence proves accepted source identity, native characterization, controlling golden carrier bytes, classified external compatibility differences, and no unresolved generic obligation at the affected extraction boundary.
 
 ## 4. Foundation boundary
 

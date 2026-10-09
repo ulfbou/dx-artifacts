@@ -80,16 +80,14 @@ A deliverable carrier containing implementation changes is produced only after:
 
 The gate output may be retained as a release artifact or operation report. Retention does not make execution metadata part of canonical carrier or envelope bytes.
 
-## 10. Baseline-acceptance evidence
+## 10. Accepted-baseline evidence
 
-Before DX Artifacts accepts the imported candidate as its controlling implementation baseline, the gate records:
+The baseline gate records:
 
-- exact candidate source identity;
-- applicable Dx.Domain evidence and result;
-- applicable Collab evidence and result;
-- one classification for every observed difference;
-- resolution evidence for every `REQUIRED_CORE` and `DEFECT` finding;
-- zero `UNRESOLVED` findings;
-- exact controlling DX v2.0.0 golden carrier identities.
+- exact accepted source provenance, byte size, and SHA-256;
+- accepted status for root `dx.py`;
+- native characterization results for CLI, parsing, selection, serialization, inspection, unpacking, application, diagnostics, and reachable exit categories;
+- exact controlling DX v2.0.0 golden carrier identities;
+- one classification and evidence reference for every imported compatibility difference.
 
-Missing cross-consumer evidence or unresolved classification fails baseline acceptance. Later native distribution gates prove console, module, supported API, and standalone forms against applicable contracts. External consumer repositories separately verify pinned releases by version, digest, and consumer integration evidence.
+Missing identity evidence, characterization failure, or unexplained golden-byte drift fails the baseline-preservation gate. An `UNRESOLVED` compatibility finding fails the affected compatibility or extraction gate when generic behavior is unclear; it does not revoke the accepted baseline by itself. Later native distribution gates prove console, module, supported API, and standalone forms against applicable contracts. External consumer repositories separately verify pinned releases by version, digest, and consumer integration evidence.

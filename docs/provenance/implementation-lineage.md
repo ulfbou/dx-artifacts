@@ -10,20 +10,14 @@ Before DX Artifacts was established, DX carrier functionality was independently 
 
 The independent implementations created split historical implementation authority outside DX Artifacts.
 
-## Bootstrap candidate
+## Accepted bootstrap baseline
 
-DX Artifacts imports the current Dx.Domain release-gate implementation as its bootstrap candidate because it is believed to represent the latest current implementation.
+DX Artifacts imported the current Dx.Domain release-gate implementation and accepted the resulting root `dx.py` as its controlling bootstrap implementation baseline. The accepted manifest records its source identity, byte size, and SHA-256, while characterization tests and golden carrier fixtures preserve observable behavior.
 
-That assessment is not a claim of proven superiority. The candidate becomes DX Artifacts' controlling implementation baseline only after:
+This acceptance records provenance and controlling implementation state without claiming that the Dx.Domain copy was historically superior to every independently maintained implementation.
 
-- its observable behavior is captured;
-- current DX v2.0.0 carrier bytes are preserved;
-- applicable Dx.Domain integration evidence passes;
-- applicable Collab codec and compatibility evidence passes;
-- every difference is classified and required findings are resolved.
-
-Collab is therefore a required external compatibility-evidence source. Its historical entry points and local behavior are not automatically promoted into the DX Artifacts core.
+Collab remains a required external compatibility-evidence source. Its historical entry points and local behavior are classified against the accepted baseline and are not automatically promoted into the DX Artifacts core. An unresolved generic compatibility obligation may block behavior-preserving extraction, but Collab evidence does not reopen or revoke baseline selection by itself.
 
 ## Continuing authority
 
-After baseline acceptance, DX Artifacts alone owns continuing generic product evolution. Dx.Domain and Collab remain external repositories and may later adopt a released DX Artifacts distribution as consumers. They retain their repository-specific orchestration, policies, adapters, and integration tests.
+DX Artifacts alone owns continuing generic product evolution. Dx.Domain and Collab remain external repositories and may later adopt a released DX Artifacts distribution as consumers. They retain their repository-specific orchestration, policies, adapters, and integration tests.

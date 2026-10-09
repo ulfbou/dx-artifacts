@@ -1,0 +1,8 @@
+%%DX v2.0.0
+%%FILE path="binary.bin" encoding="base64"
+    AP8NCg==
+%%ENDBLOCK
+%%FILE path="text.txt" trailing_newlines="2"
+alpha
+%%ENDBLOCK
+%%END

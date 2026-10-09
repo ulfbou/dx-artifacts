@@ -117,6 +117,6 @@ Bulk fixture regeneration without an explained contract change fails the gate.
 
 ## 11. Bootstrap and consumer evidence
 
-Before envelope fixtures control product evolution, DX Artifacts imports applicable Dx.Domain and Collab evidence as attributed, provenance-preserving bootstrap suites. Fixtures record source repository, source revision or release identity, original purpose, applicability, and difference classification.
+Before envelope fixtures control product evolution, DX Artifacts preserves the accepted root `dx.py` through native characterization and controlling golden carrier fixtures. These fixtures record source provenance, accepted implementation identity, purpose, byte size, SHA-256, and applicable behavior.
 
-Dx.Domain candidate fixtures establish current carrier bytes and release-gate behavior. Collab fixtures establish compatibility and regression obligations. Passing one evidence source does not substitute for the other. Golden carrier bytes become native controlling evidence only after both applicable evidence sets pass and every observed difference is classified. Later consumer repositories retain their own integration suites; those suites do not become native implementation ownership.
+Collab fixtures remain attributed compatibility and regression evidence evaluated against the accepted baseline. They may establish obligations that must be classified and resolved before affected extraction or compatibility work proceeds, but they neither select nor revoke the baseline. Later consumer repositories retain their own integration suites; those suites do not become native implementation ownership.

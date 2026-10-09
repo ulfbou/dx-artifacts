@@ -284,6 +284,6 @@ The system must reach that capability without collapsing its layers into one mon
 
 DX Artifacts natively owns generic specifications, implementation, supported interfaces, compatibility policy, conformance evidence, and distributions.
 
-The initial implementation enters this repository from the current Dx.Domain release-gate monolith as external bootstrap source material. It becomes the native controlling baseline only after applicable Dx.Domain and Collab evidence passes. Those repositories remain external evidence sources and prospective consumers. The historical .NET DXS repository contributes naming and product lineage but is not Python implementation authority.
+The initial implementation entered this repository from the current Dx.Domain release-gate monolith as external bootstrap source material and is accepted as the native controlling bootstrap baseline. Its exact identity and observable behavior are preserved through native evidence. Collab remains an external compatibility-evidence source evaluated against that baseline, while Dx.Domain and Collab remain prospective consumers. The historical .NET DXS repository contributes naming and product lineage but is not Python implementation authority.
 
 Bootstrap authority precedes envelope implementation and activates no proposed capability.

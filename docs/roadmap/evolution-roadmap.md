@@ -8,8 +8,8 @@ DX Artifacts evolves from imported, evidenced carrier behavior toward the artifa
 
 ```text
 New repository authority
-→ candidate import
-→ cross-repository baseline acceptance
+→ accepted baseline preservation
+→ external compatibility classification
 → package boundary
 → behavior-preserving decomposition
 → envelope read
@@ -26,13 +26,13 @@ New repository authority
 
 Establish DX Artifacts documentation, identities, provenance, native ownership, and external boundaries. Add no implementation behavior.
 
-## 4. Stage 1: Candidate import
+## 4. Stage 1: Accepted baseline preservation
 
-Import the Dx.Domain release-gate candidate without semantic rewriting and preserve executable historical behavior behind temporary and native entry points.
+Preserve the accepted root `dx.py` without semantic rewriting, record its exact provenance and byte identity, and establish native characterization and controlling golden carrier fixtures.
 
-## 5. Stage 2: Cross-repository baseline acceptance
+## 5. Stage 2: External compatibility classification
 
-Evaluate applicable Dx.Domain and Collab evidence, classify every difference, resolve mandatory findings, and establish controlling carrier fixtures.
+Evaluate applicable Collab evidence against the accepted baseline, classify every difference, and resolve generic obligations required before affected behavior-preserving extraction. This stage does not reopen baseline selection.
 
 ## 6. Stage 3: Package boundary and decomposition
 
