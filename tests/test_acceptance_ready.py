@@ -2,11 +2,21 @@ from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
 
-def test_pr_scope_has_no_product_evolution():
-    assert not (ROOT/"src/dx_artifacts").exists()
-    dx=(ROOT/"dx.py").read_text(encoding="utf-8")
+def test_wp01_scope_has_no_product_evolution():
+    package = ROOT / "src/dx_artifacts"
+    assert (package / "__init__.py").is_file()
+    assert (package / "_spool.py").is_file()
+    assert not (package / "envelope.py").exists()
+    assert not (package / "sinks.py").exists()
+    assert not (package / "verification.py").exists()
+
+    dx = (ROOT / "dx.py").read_text(encoding="utf-8")
     assert "%%DX-ENVELOPE" not in dx
     assert "def envelope" not in dx
+
+
+def test_accepted_monolith_is_preserved_as_immutable_evidence():
+    assert (ROOT / "tests/baseline/accepted-dx.py").is_file()
 
 def test_required_governance_documents_exist():
     for rel in [
