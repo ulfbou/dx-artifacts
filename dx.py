@@ -26,6 +26,12 @@ if _SOURCE_ROOT.is_dir() and str(_SOURCE_ROOT) not in sys.path:
     sys.path.insert(0, str(_SOURCE_ROOT))
 
 from dx_artifacts._spool import ArtifactSpool
+from dx_artifacts.sinks import (
+    FilesystemSink,
+    SinkConflictError,
+    SinkError,
+    StdoutSink,
+)
 
 try:
     from collab.filesystem import FilesystemError, atomic_write_text
@@ -791,29 +797,26 @@ def encode_entry(h: TextIO, path: str, data: bytes, readonly: bool) -> bool:
         return True
 
 
-def write_atomic(output: Path, force: bool, writer) -> None:
-    if output == Path('-'):
-        from io import StringIO
-
-        buffer = StringIO(newline="\n")
-        writer(buffer)
-        sys.stdout.buffer.write(buffer.getvalue().encode("utf-8"))
-        sys.stdout.buffer.flush()
-        return
-    # Termux exposes ~/storage/downloads through a directory symlink. Resolve
-    # only the parent, while continuing to reject a symlink at the output file.
-    if output.is_symlink():
-        raise WriteConflictError(f"refusing to replace symlink: {output}")
-    writable_output = output.parent.resolve() / output.name
+def publish_artifact(
+    output: Path,
+    force: bool,
+    source: ArtifactSpool,
+) -> None:
+    """Publish one complete spool through the selected artifact sink."""
     try:
-        atomic_write_text(writable_output, writer, replace=force)
-    except FilesystemError as exc:
-        message = str(exc)
-        if message.startswith("output already exists:"):
-            raise WriteConflictError(f"output already exists; use --force to replace it: {output}") from exc
-        if message.startswith("refusing unsafe symlink target:"):
-            raise WriteConflictError(f"refusing to replace symlink: {output}") from exc
-        raise IOErrorDx(message) from exc
+        if output == Path("-"):
+            StdoutSink().publish(source)
+        else:
+            FilesystemSink(
+                output,
+                replace=force,
+            ).publish(source)
+    except SinkConflictError as exc:
+        raise WriteConflictError(str(exc)) from exc
+    except SinkError as exc:
+        raise IOErrorDx(str(exc)) from exc
+
+
 
 
 # ------------------------- Command handlers -------------------------
@@ -872,10 +875,7 @@ def pack_command(a) -> int:
         o.output.parent.mkdir(parents=True, exist_ok=True)
     existed = o.output.exists() if o.output != Path("-") else False
     with build_carrier_spool(selected, o.readonly) as spool:
-        def writer(h):
-            spool.rewind()
-            h.write(spool.read().decode("utf-8"))
-        write_atomic(o.output, o.force, writer)
+        publish_artifact(o.output, o.force, spool)
     if o.output!=Path("-"):
         if o.quiet: print(o.output)
         else: print(f"DX carrier {'replaced' if existed else 'created'}: {o.output}\nIncluded: {len(selected)} files\nSkipped non-UTF-8: {report.filter_counts['binary_skipped']} files\nNext: dx.py inspect \"{o.output}\"",file=sys.stderr)

@@ -34,6 +34,10 @@ checks = [
         (root / "src/dx_artifacts/_spool.py").is_file(),
     ),
     (
+        "WP-02 sinks exist",
+        (root / "src/dx_artifacts/sinks.py").is_file(),
+    ),
+    (
         "no envelope implementation",
         not (root / "src/dx_artifacts/envelope.py").exists(),
     ),
