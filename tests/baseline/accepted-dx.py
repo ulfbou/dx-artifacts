@@ -21,12 +21,6 @@ from dataclasses import dataclass, replace
 from pathlib import Path, PurePosixPath
 from typing import Optional, TextIO, Iterable, List, Dict, Any
 
-_SOURCE_ROOT = Path(__file__).resolve().parent / "src"
-if _SOURCE_ROOT.is_dir() and str(_SOURCE_ROOT) not in sys.path:
-    sys.path.insert(0, str(_SOURCE_ROOT))
-
-from dx_artifacts._spool import ArtifactSpool
-
 try:
     from collab.filesystem import FilesystemError, atomic_write_text
     from collab.validation import ValidationError, require_safe_relative_path
@@ -726,42 +720,6 @@ def classify_file(data: bytes) -> str:
         return 'binary'
 
 
-def _encode_entry_bytes(
-    path: str,
-    data: bytes,
-    readonly: bool,
-) -> bytes:
-    from io import StringIO
-
-    text = StringIO(newline="\n")
-    encode_entry(text, path, data, readonly)
-    return text.getvalue().encode("utf-8")
-
-
-def build_carrier_spool(
-    selected: list[ContentDecision],
-    readonly: bool,
-) -> ArtifactSpool:
-    """Serialize one complete carrier into a seekable binary spool."""
-    spool = ArtifactSpool()
-    try:
-        spool.write(f"%%DX {VERSION}\n".encode("utf-8"))
-        for decision in selected:
-            spool.write(
-                _encode_entry_bytes(
-                    decision.path_decision.candidate.path,
-                    decision.data or b"",
-                    readonly,
-                )
-            )
-        spool.write(b"%%END\n")
-        spool.rewind()
-        return spool
-    except BaseException:
-        spool.close()
-        raise
-
-
 def encode_entry(h: TextIO, path: str, data: bytes, readonly: bool) -> bool:
     attrs = [f'path="{safe_user_path(path)}"']
     if readonly:
@@ -868,14 +826,13 @@ def pack_command(a) -> int:
     if o.binary_policy == "skip" and not o.quiet:
         for d in report.decisions:
             if d.terminal_outcome == 'binary_skipped': print(f"Omitted non-UTF-8: {d.path_decision.candidate.path}", file=sys.stderr)
-    if o.output != Path("-"):
-        o.output.parent.mkdir(parents=True, exist_ok=True)
-    existed = o.output.exists() if o.output != Path("-") else False
-    with build_carrier_spool(selected, o.readonly) as spool:
-        def writer(h):
-            spool.rewind()
-            h.write(spool.read().decode("utf-8"))
-        write_atomic(o.output, o.force, writer)
+    def writer(h):
+        h.write(f"%%DX {VERSION}\n")
+        for d in selected: encode_entry(h,d.path_decision.candidate.path,d.data or b"",o.readonly)
+        h.write("%%END\n")
+    if o.output!=Path("-"): o.output.parent.mkdir(parents=True,exist_ok=True)
+    existed=o.output.exists() if o.output!=Path("-") else False
+    write_atomic(o.output,o.force,writer)
     if o.output!=Path("-"):
         if o.quiet: print(o.output)
         else: print(f"DX carrier {'replaced' if existed else 'created'}: {o.output}\nIncluded: {len(selected)} files\nSkipped non-UTF-8: {report.filter_counts['binary_skipped']} files\nNext: dx.py inspect \"{o.output}\"",file=sys.stderr)

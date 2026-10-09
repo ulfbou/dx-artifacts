@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "status": "accepted",
-  "implementation_path": "dx.py",
+  "implementation_path": "tests/baseline/accepted-dx.py",
   "source_repository": "Dx.Domain",
   "source_path": "scripts/release-gate/dx.py",
   "carrier_name": "dx.py.dx.txt",
   "carrier_format": "v2.0.0",
   "implementation_sha256": "f0d9b82ee7ab35e1374262ba2191198b3b13ea18559fb96e227f701dc763e13a",
   "implementation_size": 63888,
-  "acceptance_scope": "bootstrap implementation baseline"
+  "acceptance_scope": "immutable bootstrap implementation evidence preserved before WP-01"
 }
