@@ -32,6 +32,15 @@ from dx_artifacts.sinks import (
     SinkError,
     StdoutSink,
 )
+from dx_artifacts.errors import (
+    DxError,
+    EmptySelectionError,
+    IOErrorDx,
+    InvalidCarrierError,
+    UsageError,
+    VerifyError,
+    WriteConflictError,
+)
 
 try:
     from collab.filesystem import FilesystemError, atomic_write_text
@@ -82,26 +91,6 @@ ATTR_RE = re.compile(r'(\w+)="([^"]*)"')
 NUMBERED_RE = re.compile(r'^dx-carrier-(\d+)\.dx\.txt$')
 
 
-class DxError(ValueError):
-    """Base class for operational errors."""
-    exit_code = 2  # default usage error
-
-class UsageError(DxError):
-    exit_code = 2
-
-class InvalidCarrierError(DxError):
-    exit_code = 3
-
-class IOErrorDx(DxError):
-    exit_code = 4
-
-class WriteConflictError(DxError):
-    exit_code = 5
-
-class VerifyError(DxError):
-    exit_code = 6
-class EmptySelectionError(DxError):
-    exit_code = 7
 
 
 @dataclass(frozen=True)

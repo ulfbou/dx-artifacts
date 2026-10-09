@@ -8,7 +8,8 @@ def test_wp01_scope_has_no_product_evolution():
     assert (package / "_spool.py").is_file()
     assert not (package / "envelope.py").exists()
     assert (package / "sinks.py").is_file()
-    assert not (package / "verification.py").exists()
+    assert (package / "errors.py").is_file()
+    assert (package / "verification.py").is_file()
 
     dx = (ROOT / "dx.py").read_text(encoding="utf-8")
     assert "%%DX-ENVELOPE" not in dx
