@@ -1,4 +1,4 @@
-# ADR-007: Dx.Domain supplies the bootstrap baseline candidate
+# ADR-007: Dx.Domain supplies the accepted bootstrap baseline
 
 ## Status
 
@@ -6,27 +6,25 @@ Accepted.
 
 ## Context
 
-DX Artifacts requires external source material to bootstrap without a clean-room rewrite. Dx.Domain supplies the implementation candidate; Dx.Domain and Collab supply independently maintained evidence.
+DX Artifacts required external source material to bootstrap without a clean-room rewrite. Dx.Domain supplied the imported implementation, while Collab remains an independently maintained compatibility-evidence source.
 
 ## Decision
 
-DX Artifacts imports the current Dx.Domain `scripts/release-gate/dx.py` as its bootstrap implementation candidate because it is believed to represent the latest current implementation.
+DX Artifacts accepts the root `dx.py` imported from Dx.Domain `scripts/release-gate/dx.py` as its controlling bootstrap implementation baseline. Its source provenance, exact byte identity, observable behavior, and controlling golden carrier bytes are recorded and mechanically verified.
 
-It is accepted as the controlling implementation only after its existing behavior is captured, current DX v2.0.0 carrier bytes are preserved, applicable Dx.Domain release-gate integration passes, applicable Collab codec and compatibility evidence passes, and every difference is classified rather than silently merged.
-
-Difference classifications are `REQUIRED_CORE`, `CONSUMER_ADAPTER`, `LEGACY_COMPATIBILITY`, `HISTORICAL_ONLY`, `DEFECT`, and `UNRESOLVED`. Any `UNRESOLVED` finding blocks controlling-baseline acceptance.
+Applicable Collab codec and compatibility evidence is evaluated against the accepted baseline. Differences are classified rather than silently merged as `REQUIRED_CORE`, `CONSUMER_ADAPTER`, `LEGACY_COMPATIBILITY`, `HISTORICAL_ONLY`, `DEFECT`, or `UNRESOLVED`. An `UNRESOLVED` generic obligation blocks the affected compatibility or extraction boundary; it does not reopen baseline selection by itself.
 
 ## Consequences
 
-- Candidate selection is transparent without claiming unexecuted superiority.
-- Collab remains required compatibility evidence.
+- Accepted provenance is transparent without claiming historical superiority.
+- Collab remains required compatibility evidence evaluated against the baseline.
 - Consumer-specific behavior is not automatically absorbed into the core.
-- Structural extraction starts only after baseline acceptance.
+- Structural extraction starts only after baseline identity and applicable characterization gates pass.
 
 ## Verification obligations
 
-- Applicable evidence from both consumers runs against the candidate.
-- Exact controlling carrier bytes are recorded.
-- Every difference has one documented classification.
-- Required core and defect findings are resolved.
-- No unresolved finding remains when the baseline is declared.
+- The accepted root `dx.py` matches its recorded provenance, byte size, and SHA-256.
+- Exact controlling carrier bytes are recorded and reproducible.
+- Native characterization covers applicable observable baseline behavior.
+- Every imported compatibility difference has one documented classification.
+- No unresolved generic obligation remains when the affected extraction boundary begins.

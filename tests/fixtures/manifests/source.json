@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "files": [
+    {
+      "path": "text.txt",
+      "size": 7,
+      "sha256": "1d9e9bdc4ffd505aa2ee64c024f8bece1a280d14e5b47807529fe12e8668effe"
+    },
+    {
+      "path": "binary.bin",
+      "size": 4,
+      "sha256": "e9489f37fb3051e9efa1dc916004d7274e7b63975e3209708947267f2393a9be"
+    }
+  ]
+}

@@ -6,9 +6,9 @@ This blueprint shapes implementation inside the new DX Artifacts repository. It 
 
 ```text
 Imported monolith
-    External candidate preserved as historical and behavioral evidence.
+    Accepted root `dx.py` preserved as historical and behavioral evidence.
 Transitional package
-    Candidate behavior runs behind native package and CLI entry points.
+    Accepted baseline behavior runs behind native package and CLI entry points.
 Extracted architecture
     Responsibilities move into focused native modules without contract changes.
 Evolved product
@@ -29,4 +29,4 @@ Consumer-ready product
 
 ## Authority
 
-Implementation guidance is constrained by accepted DX Artifacts documentation. External source behavior controls the native baseline only after the bootstrap gate accepts it. Future consumer repositories do not control native module structure or delivery sequence.
+Implementation guidance is constrained by accepted DX Artifacts documentation. The accepted root `dx.py`, its manifest, golden fixtures, and characterization evidence control the native bootstrap baseline. Future consumer repositories do not control native module structure or delivery sequence.

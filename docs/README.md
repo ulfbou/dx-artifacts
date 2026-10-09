@@ -39,8 +39,8 @@ Verification and controlled application
 This documentation is written from inside DX Artifacts.
 
 - DX Artifacts owns generic DX product behavior and release authority.
-- The current Dx.Domain release-gate `dx.py` is external bootstrap source material and a candidate baseline, not an authority inside this repository.
-- Applicable Dx.Domain and Collab behavior supplies external provenance and compatibility evidence during baseline acceptance.
+- The root `dx.py`, imported from the Dx.Domain release gate, is the accepted bootstrap implementation baseline. It is evidence preserved inside this repository, not continuing authority delegated to Dx.Domain.
+- Applicable Collab behavior supplies external compatibility evidence evaluated against the accepted baseline; it does not reopen baseline selection.
 - Dx.Domain and Collab are prospective consumer repositories after DX Artifacts publishes a consumer-ready release.
 - pystd-suite is related but independently governed and neither owns nor supplies DX runtime code.
 
@@ -101,7 +101,7 @@ An envelope does not replace the carrier format. Compression does not redefine c
 
 DX Artifacts is authoritative for its specifications, architecture, release policy, and accepted repository state.
 
-The imported Dx.Domain implementation becomes the controlling implementation baseline only after applicable Dx.Domain and Collab evidence passes against it, all differences are classified, and no unresolved finding remains. Until then it is a bootstrap candidate preserved as historical and behavioral evidence.
+The imported Dx.Domain implementation is the controlling bootstrap baseline. Its exact identity and observable behavior are preserved through the accepted manifest, golden carrier fixtures, and characterization tests. Collab differences are classified as compatibility evidence against that baseline; an unresolved generic obligation may block later extraction but does not revoke baseline acceptance by itself.
 
 No documentation statement alone proves implementation behavior. Capabilities become supported only after the applicable conformance gate passes.
 

@@ -6,7 +6,7 @@ This plan sequences bootstrap, behavior-preserving decomposition, product evolut
 
 ## 2. Global rules
 
-Every work package must preserve established carrier semantics unless its scope explicitly changes them, compare candidate behavior with controlling state, test every changed contract, avoid unsupported capability claims, and stop when mandatory evidence is missing.
+Every work package must preserve established carrier semantics unless its scope explicitly changes them, compare changed behavior with the accepted controlling baseline, test every changed contract, avoid unsupported capability claims, and stop when mandatory evidence is missing.
 
 ## 3. WP-00A: Bootstrap the new repository
 
@@ -23,35 +23,34 @@ Every work package must preserve established carrier semantics unless its scope 
 - Dx.Domain and Collab appear only as attributed sources and prospective external consumers.
 - No grammar or CLI behavior changes.
 
-## 4. WP-00B: Import the bootstrap candidate
+## 4. WP-00B: Preserve and characterize the accepted baseline
 
 ### Scope
 
-- Import Dx.Domain `scripts/release-gate/dx.py` without semantic rewriting.
-- Preserve a temporary compatibility entry point.
-- Capture candidate software, CLI, diagnostics, exit, and carrier behavior.
-- Establish package and module invocation around the imported behavior.
+- Preserve the accepted root `dx.py` without semantic rewriting.
+- Record exact source provenance, byte size, and SHA-256.
+- Characterize current CLI, diagnostics, exit, selection, carrier, inspection, unpack, and apply behavior.
+- Establish controlling golden carrier fixtures.
 
 ### Exclusions
 
-No envelope implementation, stdout-default activation, diagnostic rewrite, or structural decomposition.
+No envelope implementation, stdout-default activation, diagnostic rewrite, package extraction, or structural decomposition.
 
-## 5. WP-00C: Accept the cross-repository baseline
+## 5. WP-00C: Classify external compatibility evidence
 
 ### Scope
 
-- Import applicable Dx.Domain evidence.
-- Import applicable Collab evidence.
-- Run both against the candidate inside DX Artifacts.
+- Import applicable Collab compatibility and regression evidence.
+- Run it against the accepted baseline inside DX Artifacts.
 - Classify every difference.
-- Establish controlling golden fixtures.
+- Resolve obligations required before affected behavior-preserving extraction.
 
 ### Acceptance
 
-- Every difference is classified.
-- `REQUIRED_CORE` and `DEFECT` findings are resolved.
-- No `UNRESOLVED` finding remains.
-- Exact controlling DX v2.0.0 carrier bytes are recorded.
+- Every imported compatibility difference is classified.
+- `REQUIRED_CORE` and `DEFECT` findings affecting generic behavior are resolved before the affected extraction boundary.
+- No relevant `UNRESOLVED` generic obligation remains when that extraction boundary begins.
+- Baseline selection remains closed and exact controlling DX v2.0.0 carrier bytes remain unchanged.
 
 ## 6. WP-01: Binary artifact spool
 
