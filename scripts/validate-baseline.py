@@ -38,6 +38,14 @@ checks = [
         (root / "src/dx_artifacts/sinks.py").is_file(),
     ),
     (
+        "WP-03 typed errors exist",
+        (root / "src/dx_artifacts/errors.py").is_file(),
+    ),
+    (
+        "WP-03 verification results exist",
+        (root / "src/dx_artifacts/verification.py").is_file(),
+    ),
+    (
         "no envelope implementation",
         not (root / "src/dx_artifacts/envelope.py").exists(),
     ),
