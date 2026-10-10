@@ -32,6 +32,14 @@ from dx_artifacts.sinks import (
     SinkError,
     StdoutSink,
 )
+from dx_artifacts.reports import (
+    ArtifactIdentity,
+    DeliveryEvidence,
+    OperationReport,
+    ReportError,
+    VerificationEvidence,
+    publish_report,
+)
 from dx_artifacts.errors import (
     DxError,
     EmptySelectionError,
@@ -825,23 +833,105 @@ def publish_artifact(
     output: Path,
     force: bool,
     source: ArtifactSpool,
-) -> None:
+):
     """Publish one complete spool through the selected artifact sink."""
     try:
         if output == Path("-"):
-            StdoutSink().publish(source)
-        else:
-            FilesystemSink(
-                output,
-                replace=force,
-            ).publish(source)
+            return StdoutSink().publish(source)
+        return FilesystemSink(
+            output,
+            replace=force,
+        ).publish(source)
     except SinkConflictError as exc:
         raise WriteConflictError(str(exc)) from exc
     except SinkError as exc:
         raise IOErrorDx(str(exc)) from exc
 
 
+def _report_path(raw: str | None) -> Path | None:
+    if raw is None:
+        return None
+    path = Path(raw)
+    if not path.is_absolute():
+        path = Path.cwd() / path
+    return path
 
+
+def _reject_artifact_report_identity(
+    output: Path,
+    report_path: Path | None,
+) -> None:
+    if output == Path("-") or report_path is None:
+        return
+    try:
+        if output.resolve() == report_path.resolve():
+            raise WriteConflictError(
+                "artifact and report must use different "
+                "filesystem objects"
+            )
+    except OSError as exc:
+        raise IOErrorDx(
+            f"cannot resolve artifact-report identity: {exc}"
+        ) from exc
+
+
+def _artifact_identity(
+    data: bytes,
+    artifact_format: str,
+) -> ArtifactIdentity:
+    if artifact_format == "envelope":
+        return ArtifactIdentity.from_bytes(
+            data,
+            media_type="application/vnd.dx.envelope",
+            format_version="v1.0.0",
+        )
+    return ArtifactIdentity.from_bytes(
+        data,
+        media_type="application/vnd.dx.carrier",
+        format_version=VERSION,
+    )
+
+
+def _delivery_evidence(result) -> DeliveryEvidence:
+    return DeliveryEvidence(
+        sink=result.sink,
+        completed=result.completed,
+        bytes_written=result.bytes_written,
+        destination=(
+            str(result.destination)
+            if result.destination is not None
+            else None
+        ),
+    )
+
+
+def _publish_success_report(
+    *,
+    report_path: Path | None,
+    command: str,
+    artifact_bytes: bytes,
+    artifact_format: str,
+    representations: tuple[ArtifactIdentity, ...],
+    verification: tuple[VerificationEvidence, ...],
+    delivery,
+) -> None:
+    if report_path is None:
+        return
+    report = OperationReport(
+        command=command,
+        success=True,
+        artifact=_artifact_identity(
+            artifact_bytes,
+            artifact_format,
+        ),
+        representation=representations,
+        verification=verification,
+        delivery=_delivery_evidence(delivery),
+    )
+    try:
+        publish_report(report, report_path)
+    except ReportError as exc:
+        raise IOErrorDx(str(exc)) from exc
 
 # ------------------------- Command handlers -------------------------
 
@@ -943,11 +1033,11 @@ def _publish_artifact_bytes(
     payload: bytes,
     output: Path,
     force: bool,
-) -> None:
+):
     with ArtifactSpool() as spool:
         spool.write(payload)
         spool.rewind()
-        publish_artifact(output, force, spool)
+        return publish_artifact(output, force, spool)
 
 
 def envelope_command(a) -> int:
@@ -974,10 +1064,45 @@ def envelope_command(a) -> int:
         carrier_bytes,
         carrier_name=a.carrier_name,
     )
-    _publish_artifact_bytes(
+    report_path = _report_path(a.report)
+    _reject_artifact_report_identity(
+        output,
+        report_path,
+    )
+    delivery = _publish_artifact_bytes(
         produced.envelope_bytes,
         output,
         a.force,
+    )
+    _publish_success_report(
+        report_path=report_path,
+        command="envelope",
+        artifact_bytes=produced.envelope_bytes,
+        artifact_format="envelope",
+        representations=(
+            _artifact_identity(
+                carrier_bytes,
+                "carrier",
+            ),
+            ArtifactIdentity.from_bytes(
+                produced.zip_bytes,
+                media_type="application/zip",
+                format_version="canonical-v1",
+            ),
+        ),
+        verification=(
+            VerificationEvidence(
+                policy="structural",
+                passed=True,
+                layer="carrier",
+            ),
+            VerificationEvidence(
+                policy="canonical",
+                passed=True,
+                layer="envelope",
+            ),
+        ),
+        delivery=delivery,
     )
 
     if output != Path("-") and not a.quiet:
@@ -1004,10 +1129,40 @@ def unwrap_command(a) -> int:
         _read_artifact_bytes(a.input)
     )
     _parse_carrier_bytes(verified.carrier_bytes)
-    _publish_artifact_bytes(
+    report_path = _report_path(a.report)
+    _reject_artifact_report_identity(
+        output,
+        report_path,
+    )
+    delivery = _publish_artifact_bytes(
         verified.carrier_bytes,
         output,
         a.force,
+    )
+    _publish_success_report(
+        report_path=report_path,
+        command="unwrap",
+        artifact_bytes=verified.carrier_bytes,
+        artifact_format="carrier",
+        representations=(
+            _artifact_identity(
+                _read_artifact_bytes(a.input),
+                "envelope",
+            ),
+        ),
+        verification=(
+            VerificationEvidence(
+                policy="integrity",
+                passed=True,
+                layer="envelope",
+            ),
+            VerificationEvidence(
+                policy="structural",
+                passed=True,
+                layer="carrier",
+            ),
+        ),
+        delivery=delivery,
     )
 
     if output != Path("-") and not a.quiet:
@@ -1153,7 +1308,13 @@ def _decision_json(decision: ContentDecision) -> dict[str,Any]:
 
 
 def pack_command(a) -> int:
-    o=normalize_pack_options(a); ctx=build_selection_context(o); report=select_for_pack(ctx)
+    o=normalize_pack_options(a)
+    report_path = _report_path(a.report)
+    _reject_artifact_report_identity(
+        o.output,
+        report_path,
+    )
+    ctx=build_selection_context(o); report=select_for_pack(ctx)
     selected=[d for d in report.decisions if d.terminal_outcome=="selected"]
     if o.explain=="human":
         for d in report.decisions:
@@ -1195,20 +1356,65 @@ def pack_command(a) -> int:
                     produced.envelope_bytes
                 )
                 artifact_spool.rewind()
-                publish_artifact(
+                delivery = publish_artifact(
                     o.output,
                     o.force,
                     artifact_spool,
                 )
             artifact_label = "DX envelope"
+            artifact_bytes = produced.envelope_bytes
+            artifact_format = "envelope"
+            representations = (
+                _artifact_identity(
+                    carrier_bytes,
+                    "carrier",
+                ),
+                ArtifactIdentity.from_bytes(
+                    produced.zip_bytes,
+                    media_type="application/zip",
+                    format_version="canonical-v1",
+                ),
+            )
+            verification = (
+                VerificationEvidence(
+                    policy="structural",
+                    passed=True,
+                    layer="carrier",
+                ),
+                VerificationEvidence(
+                    policy="canonical",
+                    passed=True,
+                    layer="envelope",
+                ),
+            )
         else:
             carrier_spool.rewind()
-            publish_artifact(
+            delivery = publish_artifact(
                 o.output,
                 o.force,
                 carrier_spool,
             )
             artifact_label = "DX carrier"
+            artifact_bytes = carrier_bytes
+            artifact_format = "carrier"
+            representations = ()
+            verification = (
+                VerificationEvidence(
+                    policy="structural",
+                    passed=True,
+                    layer="carrier",
+                ),
+            )
+
+    _publish_success_report(
+        report_path=_report_path(a.report),
+        command="pack",
+        artifact_bytes=artifact_bytes,
+        artifact_format=artifact_format,
+        representations=representations,
+        verification=verification,
+        delivery=delivery,
+    )
 
     if o.output != Path("-"):
         if o.quiet:
@@ -1540,6 +1746,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument('output', nargs='?', metavar='OUTPUT', help=argparse.SUPPRESS)  # deprecated
     p.add_argument('-o', '--output', dest='output_opt', help='Output artifact path, or "-" for stdout')
     p.add_argument(
+        "--report",
+        help="Write a machine-readable operation report",
+    )
+    p.add_argument(
         "--format",
         choices=("carrier", "envelope"),
         default="carrier",
@@ -1641,6 +1851,10 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Replace an existing filesystem output",
     )
+    envelope_parser.add_argument(
+        "--report",
+        help="Write a machine-readable operation report",
+    )
     envelope_parser.set_defaults(
         func=envelope_command
     )
@@ -1680,6 +1894,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--force",
         action="store_true",
         help="Replace an existing filesystem output",
+    )
+    unwrap_parser.add_argument(
+        "--report",
+        help="Write a machine-readable operation report",
     )
     unwrap_parser.set_defaults(
         func=unwrap_command

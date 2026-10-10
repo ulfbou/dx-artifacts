@@ -67,6 +67,17 @@ checks = [
             / "tests/test_wp07_integrated_pack_envelope.py"
         ).is_file(),
     ),
+    (
+        "WP-08 report contracts exist",
+        (
+            root
+            / "src/dx_artifacts/reports.py"
+        ).is_file()
+        and (
+            root
+            / "tests/test_wp08_operation_reports.py"
+        ).is_file(),
+    ),
 ]
 
 for name, passed in checks:
