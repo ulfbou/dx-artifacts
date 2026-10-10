@@ -8,4 +8,4 @@ Migration has two distinct directions:
 - [Bootstrap baseline](bootstrap-baseline.md) defines candidate import and baseline acceptance inside DX Artifacts.
 - [Consumer transition](consumer-transition.md) defines later, independent adoption by Dx.Domain and Collab.
 
-Consumer adoption is not a prerequisite for DX Artifacts decomposition or product development. Migration does not itself change carrier or envelope grammar or activate stdout-default behavior.
+Consumer adoption is not a prerequisite for DX Artifacts decomposition or product development. Migration does not itself change carrier or envelope grammar. Stdout-default behavior was activated separately by WP-10.

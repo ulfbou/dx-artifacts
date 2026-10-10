@@ -10,11 +10,11 @@ source → construct → verify → transform → verify → publish
 
 Integrated commands and explicit pipelines use the same logical stages.
 
-## 2. Target stdout-first production
+## 2. Active stdout-first production
 
-This section defines target behavior governed by ADR-002. Bootstrap and decomposition preserve the accepted baseline default until WP-10 activates this compatibility change.
+This section defines the active behavior governed by ADR-002 and activated by WP-10.
 
-After activation, artifact-producing commands follow:
+Artifact-producing commands follow:
 
 ```text
 No -o supplied     → stdout
@@ -129,4 +129,4 @@ Each equality is byte equality.
 
 ## 12. Activation boundary
 
-Bootstrap import, baseline acceptance, package establishment, and behavior-preserving decomposition retain the accepted omitted-`-o` behavior. Stdout-default activation occurs only in WP-10 after the compatibility gate passes. Future consumer migration occurs after a consumer-ready release and does not control activation inside DX Artifacts.
+Bootstrap import, baseline acceptance, package establishment, and behavior-preserving decomposition retained the historical omitted-`-o` behavior. WP-10 passed its compatibility gate and activated stdout as the default artifact sink. Future consumer migration occurs after a consumer-ready release and does not control activation inside DX Artifacts.

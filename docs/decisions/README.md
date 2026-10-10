@@ -14,7 +14,7 @@ Rejected
 ## Register
 
 - [ADR-001: Envelope is a separate format](ADR-001-envelope-is-a-separate-format.md), Proposed.
-- [ADR-002: Stdout is the default artifact output sink](ADR-002-stdout-is-the-default-output-sink.md), Proposed and not activated during bootstrap.
+- [ADR-002: Stdout is the default artifact output sink](ADR-002-stdout-is-the-default-output-sink.md), Accepted and activated by WP-10.
 - [ADR-003: Canonical profiles replace arbitrary low-level envelope combinations](ADR-003-canonical-profiles-over-low-level-options.md), Proposed.
 - [ADR-004: Serialize once and verify exact bytes](ADR-004-serialize-once-verify-exact-bytes.md), Proposed.
 - [ADR-005: DX Artifacts is the authoritative home](ADR-005-dx-artifacts-is-the-authoritative-home.md), Accepted.

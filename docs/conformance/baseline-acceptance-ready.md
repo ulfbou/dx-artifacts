@@ -18,7 +18,7 @@ The PR is acceptance-ready only when every applicable result is explicit and pas
 
 ## Contract preservation
 
-- Current omitted-output behavior remains numbered filesystem publication.
+- The accepted bootstrap baseline used numbered filesystem publication for omitted output. WP-10 supersedes that default: omitted output now selects stdout.
 - Explicit stdout behavior remains byte-exact and diagnostics stay off artifact stdout.
 - Current supported carrier parsing remains characterized.
 - Read-only, binary, escaped text, deterministic ordering, and trailing-newline behavior remain characterized.
