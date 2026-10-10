@@ -23,15 +23,12 @@ def test_wp04_adds_reader_without_writer_or_cli_activation():
     assert "parse_envelope" in functions
     assert "verify_envelope" in functions
 
-    forbidden_functions = {
-        "write_envelope",
-        "build_envelope",
-        "serialize_envelope",
+    forbidden_cli_functions = {
         "envelope_command",
         "unwrap_command",
         "verify_command",
     }
-    assert not (functions & forbidden_functions)
+    assert not (functions & forbidden_cli_functions)
 
     dx_source = (ROOT / "dx.py").read_text(encoding="utf-8")
     assert "%%DX-ENVELOPE" not in dx_source

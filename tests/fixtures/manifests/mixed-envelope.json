@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "fixture": "mixed canonical-v1 envelope",
+  "review_status": "candidate",
+  "source_carrier": {
+    "path": "tests/fixtures/carriers/golden/mixed.dx.txt",
+    "bytes": 147,
+    "sha256": "d3fa95774658fc1b9e1085ff138460cffd24c30ed4cde68c9c1ab05ffdbeae07"
+  },
+  "canonical_zip": {
+    "path": "tests/fixtures/envelopes/golden/mixed.canonical-v1.zip",
+    "bytes": 239,
+    "sha256": "4873bec26867cd53895e7a103a993b4359cf3fae26824e64da97efed2a3b8725"
+  },
+  "canonical_base64": {
+    "path": "tests/fixtures/envelopes/golden/mixed.canonical-v1.base64.txt",
+    "bytes": 325,
+    "sha256": "408c61846ffdf733a10a572f28b3a21acbb3c9dec8ecf8a6cd234cbcd6bb20da"
+  },
+  "canonical_envelope": {
+    "path": "tests/fixtures/envelopes/golden/mixed.dx.envelope.txt",
+    "bytes": 666,
+    "sha256": "78a0c4f5e3fc96310d7feed8952fc597a4faee72a864ca649c6767b58acb7a33"
+  },
+  "runtime_boundary": {
+    "python": "3.13.13",
+    "zip_implementation": "python.zipfile",
+    "compression": "DEFLATE",
+    "compression_level": 9
+  }
+}

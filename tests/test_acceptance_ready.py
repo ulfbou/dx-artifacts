@@ -7,6 +7,7 @@ def test_wp01_scope_has_no_product_evolution():
     assert (package / "__init__.py").is_file()
     assert (package / "_spool.py").is_file()
     assert (package / "envelope.py").is_file()
+    assert (package / "profiles.py").is_file()
     assert (package / "sinks.py").is_file()
     assert (package / "errors.py").is_file()
     assert (package / "verification.py").is_file()
