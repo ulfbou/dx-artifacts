@@ -354,7 +354,7 @@ def test_destination_symlink_is_rejected(
     assert target.read_bytes() == b"target"
 
 
-def test_wp08_through_wp10_are_not_activated(
+def test_wp09_and_wp10_are_not_activated(
     run_dx,
     tmp_path,
 ):
@@ -369,5 +369,5 @@ def test_wp08_through_wp10_are_not_activated(
     dx_source = (ROOT / "dx.py").read_text(
         encoding="utf-8"
     )
-    assert "--report" not in dx_source
+    assert "--report" in dx_source
     assert "capabilities_command" not in dx_source

@@ -229,7 +229,7 @@ def test_invalid_integrated_carrier_name_is_rejected(
     assert result.returncode == 3
 
 
-def test_wp08_through_wp10_remain_inactive(
+def test_wp09_and_wp10_remain_inactive(
     run_dx,
     tmp_path,
 ):
@@ -244,5 +244,5 @@ def test_wp08_through_wp10_remain_inactive(
     dx_source = (ROOT / "dx.py").read_text(
         encoding="utf-8"
     )
-    assert "--report" not in dx_source
+    assert "--report" in dx_source
     assert "capabilities_command" not in dx_source
