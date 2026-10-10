@@ -32,7 +32,7 @@
 - `PK-003` force replaces output.
 - `PK-004` output symlink is rejected.
 - `PK-005` explicit stdout emits carrier bytes only.
-- `PK-006` omitted output preserves numbered filesystem output.
+- `PK-006` records the historical bootstrap behavior in which omitted output preserved numbered filesystem output; WP-10 supersedes that default with stdout.
 - `PK-007` numbering advances over existing carriers.
 - `PK-008` through `PK-016` cover quiet, verbose, positional-output compatibility, conflicting output options, dry run, dry-run JSON, empty selection, self-exclusion, and exact golden output.
 
@@ -63,4 +63,4 @@ An unreachable category is documented as unreachable; tests must not invent unsu
 
 ## Non-regression gate
 
-`NG-001` through `NG-010` protect source identity, golden bytes, supported parsing, serialization, omitted output, explicit stdout, diagnostic markers, exit categories, exact round-trip, and PR scope.
+`NG-001` through `NG-010` protect source identity, golden bytes, supported parsing, serialization, historical bootstrap omitted-output behavior, explicit stdout, diagnostic markers, exit categories, exact round-trip, and PR scope.

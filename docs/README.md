@@ -113,4 +113,4 @@ No documentation statement alone proves implementation behavior. Capabilities be
 - ADRs record decisions and their status.
 - Roadmaps sequence work without activating capabilities.
 - Bootstrap preserves observed carrier behavior and existing CLI defaults.
-- Envelope behavior and stdout-default behavior remain inactive until their separately defined implementation and compatibility boundaries pass.
+- Stdout-default behavior is active following WP-10. Envelope behavior is supported only where its separately defined implementation and conformance boundaries have passed.

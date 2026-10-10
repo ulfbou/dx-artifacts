@@ -46,7 +46,7 @@ DX Artifacts preserves it as historical and behavioral evidence. Later modulariz
 Bootstrap must not:
 
 - combine import or extraction with envelope implementation;
-- change omitted-`-o` behavior;
+- record the later WP-10 change to omitted-`-o` behavior;
 - rewrite diagnostics during structural extraction;
 - absorb every Collab historical behavior into the native core;
 - modify the accepted baseline while claiming behavior-preserving import or characterization;

@@ -398,9 +398,9 @@ dx pack SOURCE |
 
 The integrated implementation may optimize repeated parsing only when equivalent verification is preserved and the resulting bytes remain identical.
 
-## 10. Target output and report separation
+## 10. Active output and report separation
 
-After WP-10 activation, artifact-producing commands follow this contract. Before that boundary, DX Artifacts preserves the accepted bootstrap output default:
+Following WP-10 activation, artifact-producing commands follow this contract:
 
 ```text
 No -o supplied     → artifact to stdout
