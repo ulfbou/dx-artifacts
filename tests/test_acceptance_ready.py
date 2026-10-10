@@ -13,8 +13,10 @@ def test_wp01_scope_has_no_product_evolution():
     assert (package / "verification.py").is_file()
 
     dx = (ROOT / "dx.py").read_text(encoding="utf-8")
-    assert "%%DX-ENVELOPE" not in dx
-    assert "def envelope" not in dx
+    assert "def envelope_command" in dx
+    assert "def unwrap_command" in dx
+    assert "def verify_command" in dx
+    assert "--format" in dx
 
 
 def test_accepted_monolith_is_preserved_as_immutable_evidence():

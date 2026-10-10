@@ -53,6 +53,20 @@ checks = [
         "WP-05 canonical profile exists",
         (root / "src/dx_artifacts/profiles.py").is_file(),
     ),
+    (
+        "WP-06 standalone commands exist",
+        (
+            root
+            / "tests/test_wp06_standalone_envelope_cli.py"
+        ).is_file(),
+    ),
+    (
+        "WP-07 integrated transformation exists",
+        (
+            root
+            / "tests/test_wp07_integrated_pack_envelope.py"
+        ).is_file(),
+    ),
 ]
 
 for name, passed in checks:
