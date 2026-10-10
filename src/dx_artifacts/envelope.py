@@ -629,3 +629,230 @@ def verify_envelope(
         carrier_sha256=carrier_sha256,
         parsed_carrier_version=parsed_carrier_version,
     )
+
+
+@dataclass(frozen=True)
+class CanonicalEnvelope:
+    """One self-verified canonical envelope and its exact representations."""
+
+    envelope_bytes: bytes
+    zip_bytes: bytes
+    carrier_bytes: bytes
+    carrier_name: str
+    carrier_version: str
+    carrier_size: int
+    carrier_sha256: str
+    zip_size: int
+    zip_sha256: str
+    envelope_size: int
+    envelope_sha256: str
+
+
+def _canonical_zip(
+    carrier_bytes: bytes,
+    carrier_name: str,
+) -> bytes:
+    """Produce the deterministic canonical-v1 ZIP representation."""
+
+    from .profiles import CANONICAL_V1
+
+    output = io.BytesIO()
+
+    with zipfile.ZipFile(
+        output,
+        mode="w",
+        compression=CANONICAL_V1.zip_compression,
+        compresslevel=CANONICAL_V1.zip_compresslevel,
+        strict_timestamps=True,
+    ) as archive:
+        archive.comment = CANONICAL_V1.zip_archive_comment
+
+        info = zipfile.ZipInfo(
+            filename=carrier_name,
+            date_time=CANONICAL_V1.zip_timestamp,
+        )
+        info.compress_type = CANONICAL_V1.zip_compression
+        info.create_system = CANONICAL_V1.zip_create_system
+        info.external_attr = CANONICAL_V1.zip_external_attr
+        info.flag_bits = CANONICAL_V1.zip_flag_bits
+        info.comment = CANONICAL_V1.zip_entry_comment
+        info.extra = CANONICAL_V1.zip_extra
+
+        archive.writestr(
+            info,
+            carrier_bytes,
+            compress_type=CANONICAL_V1.zip_compression,
+            compresslevel=CANONICAL_V1.zip_compresslevel,
+        )
+
+    return output.getvalue()
+
+
+def _canonical_payload_lines(zip_bytes: bytes) -> tuple[bytes, ...]:
+    """Encode canonical RFC 4648 Base64 physical lines."""
+
+    from .profiles import CANONICAL_V1
+
+    encoded = base64.b64encode(zip_bytes)
+    width = CANONICAL_V1.base64_line_width
+
+    return tuple(
+        encoded[position : position + width]
+        for position in range(0, len(encoded), width)
+    )
+
+
+def _canonical_framing(
+    *,
+    carrier_name: str,
+    carrier_version: str,
+    carrier_size: int,
+    carrier_sha256: str,
+    zip_size: int,
+    zip_sha256: str,
+    payload_lines: tuple[bytes, ...],
+) -> bytes:
+    """Serialize canonical envelope framing in fixed directive order."""
+
+    from .profiles import CANONICAL_V1
+
+    return b"\n".join(
+        [
+            (
+                f'%%DX-ENVELOPE {CANONICAL_V1.envelope_version} '
+                f'profile="{CANONICAL_V1.name}"'
+            ).encode("ascii"),
+            (
+                f'%%CARRIER filename="{carrier_name}" '
+                f'version="{carrier_version}" '
+                f'size="{carrier_size}" '
+                f'sha256="{carrier_sha256}"'
+            ).encode("utf-8"),
+            (
+                f'%%PAYLOAD media_type="{CANONICAL_V1.payload_media_type}" '
+                f'encoding="{CANONICAL_V1.payload_encoding}" '
+                f'size="{zip_size}" '
+                f'sha256="{zip_sha256}"'
+            ).encode("ascii"),
+            *payload_lines,
+            b"%%ENDPAYLOAD",
+            b"%%END",
+            b"",
+        ]
+    )
+
+
+def verify_canonical_envelope(
+    envelope_bytes: bytes,
+    *,
+    limits: EnvelopeLimits | None = None,
+) -> VerifiedEnvelope:
+    """Require integrity and exact canonical-v1 reconstruction equality."""
+
+    verified = verify_envelope(envelope_bytes, limits=limits)
+
+    canonical_zip = _canonical_zip(
+        verified.carrier_bytes,
+        verified.envelope.carrier.filename,
+    )
+    canonical_lines = _canonical_payload_lines(canonical_zip)
+    canonical_bytes = _canonical_framing(
+        carrier_name=verified.envelope.carrier.filename,
+        carrier_version=verified.parsed_carrier_version,
+        carrier_size=verified.carrier_size,
+        carrier_sha256=verified.carrier_sha256,
+        zip_size=len(canonical_zip),
+        zip_sha256=hashlib.sha256(canonical_zip).hexdigest(),
+        payload_lines=canonical_lines,
+    )
+
+    if canonical_bytes != envelope_bytes:
+        raise EnvelopeIntegrityError(
+            "envelope differs from canonical-v1 serialization"
+        )
+
+    return verified
+
+
+def build_canonical_envelope(
+    carrier_bytes: bytes,
+    *,
+    carrier_name: str = "carrier.dx.txt",
+    limits: EnvelopeLimits | None = None,
+) -> CanonicalEnvelope:
+    """Build and self-verify one deterministic canonical-v1 envelope."""
+
+    effective = limits or EnvelopeLimits()
+
+    if not isinstance(carrier_bytes, bytes):
+        raise TypeError("carrier input must be bytes")
+
+    if len(carrier_bytes) > effective.max_carrier_bytes:
+        raise _invalid(
+            "carrier exceeds configured limit: "
+            f"{len(carrier_bytes)} > {effective.max_carrier_bytes}"
+        )
+
+    name = _validate_carrier_name(carrier_name)
+    version = carrier_version_from_bytes(carrier_bytes)
+
+    if not carrier_bytes.endswith(b"\n"):
+        raise _invalid("inner carrier must end with LF")
+
+    if not carrier_bytes.rstrip(b"\n").endswith(b"%%END"):
+        raise _invalid("inner carrier lacks terminal %%END")
+
+    carrier_size = len(carrier_bytes)
+    carrier_sha256 = hashlib.sha256(carrier_bytes).hexdigest()
+
+    zip_bytes = _canonical_zip(carrier_bytes, name)
+
+    if len(zip_bytes) > effective.max_zip_bytes:
+        raise _invalid(
+            "canonical ZIP exceeds configured limit: "
+            f"{len(zip_bytes)} > {effective.max_zip_bytes}"
+        )
+
+    zip_size = len(zip_bytes)
+    zip_sha256 = hashlib.sha256(zip_bytes).hexdigest()
+    payload_lines = _canonical_payload_lines(zip_bytes)
+
+    envelope_bytes = _canonical_framing(
+        carrier_name=name,
+        carrier_version=version,
+        carrier_size=carrier_size,
+        carrier_sha256=carrier_sha256,
+        zip_size=zip_size,
+        zip_sha256=zip_sha256,
+        payload_lines=payload_lines,
+    )
+
+    if len(envelope_bytes) > effective.max_envelope_bytes:
+        raise _invalid(
+            "canonical envelope exceeds configured limit: "
+            f"{len(envelope_bytes)} > {effective.max_envelope_bytes}"
+        )
+
+    verified = verify_canonical_envelope(
+        envelope_bytes,
+        limits=effective,
+    )
+
+    if verified.carrier_bytes != carrier_bytes:
+        raise EnvelopeIntegrityError(
+            "canonical envelope did not recover exact carrier bytes"
+        )
+
+    return CanonicalEnvelope(
+        envelope_bytes=envelope_bytes,
+        zip_bytes=zip_bytes,
+        carrier_bytes=carrier_bytes,
+        carrier_name=name,
+        carrier_version=version,
+        carrier_size=carrier_size,
+        carrier_sha256=carrier_sha256,
+        zip_size=zip_size,
+        zip_sha256=zip_sha256,
+        envelope_size=len(envelope_bytes),
+        envelope_sha256=hashlib.sha256(envelope_bytes).hexdigest(),
+    )

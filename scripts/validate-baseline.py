@@ -49,6 +49,10 @@ checks = [
         "WP-04 envelope reader exists",
         (root / "src/dx_artifacts/envelope.py").is_file(),
     ),
+    (
+        "WP-05 canonical profile exists",
+        (root / "src/dx_artifacts/profiles.py").is_file(),
+    ),
 ]
 
 for name, passed in checks:
