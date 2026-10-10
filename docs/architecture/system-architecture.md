@@ -119,9 +119,9 @@ Transformation does not change the semantic identity of the inner artifact.
 
 ### 3.6 Inspector
 
-The inspector identifies supported representations from physical content and reports their layers.
+The current `inspect` command parses DX carriers only. Physical detection of carriers versus envelopes is implemented by `verify`; recursive layered inspection is not implemented.
 
-A future recursive view can expose:
+A future recursive inspector can expose:
 
 ```text
 DX envelope
@@ -314,13 +314,16 @@ Envelope source
 
 ### 6.5 Inspection
 
+The current inspection flow is carrier-specific:
+
 ```text
-Artifact source
-→ physical-content detection
-→ layered parsing
-→ requested verification policy
-→ human or machine-readable report
+Carrier source
+→ carrier parsing
+→ selected carrier inspection mode
+→ human or machine-readable output
 ```
+
+Physical-content detection and carrier-or-envelope policy verification belong to the current `verify` flow. Recursive layered inspection remains future work.
 
 ### 6.6 Controlled application
 
@@ -451,6 +454,6 @@ Future work must preserve these constraints:
 
 ## 13. Repository and runtime boundary
 
-DX Artifacts exposes native product behavior through the `dx_artifacts` package, the `dx` console command, `python -m dx_artifacts`, and a generated standalone `dx.py` release artifact. These forms share one source authority and applicable observable contracts.
+The current repository executes product behavior through the root `dx.py`, which imports internal modules from `src/dx_artifacts`. The package currently exports no supported Python API, and the repository does not yet provide the WP-11 `dx` console command, `python -m dx_artifacts`, or a generated standalone release artifact. Those distribution forms remain required to originate from one source authority and satisfy applicable observable contracts before advertisement.
 
 The initial repository state imports an external monolith as bootstrap evidence. Later extraction changes native dependency direction without changing accepted behavior unless a separately accepted change authorizes the difference. Dx.Domain and Collab remain external evidence sources and prospective consumers; they do not participate in native generic product ownership.

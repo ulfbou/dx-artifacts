@@ -24,17 +24,16 @@ No -o supplied     → stdout
 
 This applies to `pack`, `envelope`, and `unwrap`.
 
-## 3. Stdin-first consumption
+## 3. Explicit artifact input
 
-Single-artifact consumers follow:
+The current CLI requires an `INPUT` operand for `envelope`, `unwrap`, and `verify`. Passing `-` selects stdin; passing a path selects filesystem input.
 
 ```text
-No INPUT supplied  → stdin
 INPUT -             → stdin
 INPUT FILE          → filesystem input
 ```
 
-This applies to `envelope`, `unwrap`, `inspect`, and `verify`. `pack` differs because its normal source is workspace selection.
+`inspect` separately requires a carrier operand and accepts `-` for stdin. No current single-artifact command infers stdin from an omitted operand. `pack` differs because its normal source is workspace selection and its `SOURCE` operand defaults to the current directory.
 
 ## 4. Channel contract
 
@@ -101,7 +100,7 @@ It must not verify one serialization and envelope a second serialization from re
 
 `--dry-run` evaluates source selection, options, and intended sinks without publishing an artifact. It must not claim exact final hashes unless it actually constructs the exact bytes.
 
-A future `--check` mode constructs and verifies exact bytes internally, publishes nothing, and fails if production or verification fails.
+The implementation has an internal check sink that consumes complete artifact bytes without publication. A future public `--check` mode may expose that sink; no `--check` CLI option is currently supported.
 
 ## 10. Broken pipes
 

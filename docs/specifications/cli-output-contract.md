@@ -6,7 +6,7 @@ Accepted and active following WP-10.
 
 ## Command notation
 
-`dx` is the canonical product command. Equivalent module and standalone forms are governed by the distribution and integration contract.
+`dx` is canonical contract notation. The current repository entry point is `python dx.py`; console, module, supported-API, and generated standalone distribution forms remain governed by the proposed distribution and integration contract and are not yet implemented interfaces.
 
 ## 1. Artifact-producing commands
 
@@ -43,13 +43,13 @@ output sink             stdout
 ## 3. Envelope
 
 ```text
-dx envelope [INPUT] [OPTIONS]
+dx envelope INPUT [OPTIONS]
 ```
 
 Active defaults:
 
 ```text
-INPUT                   stdin
+INPUT                   required; `-` selects stdin
 output sink             stdout
 profile                 canonical-v1
 logical carrier name    carrier.dx.txt
@@ -58,13 +58,13 @@ logical carrier name    carrier.dx.txt
 ## 4. Unwrap
 
 ```text
-dx unwrap [INPUT] [OPTIONS]
+dx unwrap INPUT [OPTIONS]
 ```
 
 Active defaults:
 
 ```text
-INPUT                   stdin
+INPUT                   required; `-` selects stdin
 output sink             stdout
 ```
 
@@ -110,14 +110,7 @@ The logical carrier name:
 
 ## 9. Diagnostics and reports
 
-Successful artifact production is silent by default.
-
-```text
-stdout      artifact bytes
-stderr      warnings and errors
---verbose   expanded diagnostics on stderr
---quiet     errors only
-```
+When stdout is the selected artifact sink, stdout contains artifact bytes and successful production is silent on stderr by default. Filesystem publication writes a completion summary to stderr by default. `pack -q -o FILE` writes the output path to stdout; `envelope --quiet` and `unwrap --quiet` suppress their completion summaries. `--verbose` adds per-file write diagnostics for `unpack` and `apply`; no broader verbose-output contract is currently implemented.
 
 Machine-readable reports require an explicit report sink and never share artifact stdout.
 
@@ -129,13 +122,14 @@ A future `--check` constructs and verifies exact bytes internally but publishes 
 
 ## 11. No-argument behavior
 
-Recommended behavior:
+The current standalone CLI preserves bootstrap-compatible no-argument behavior:
 
 ```text
-dx                       show top-level help
-dx pack                  pack current directory to stdout
+dx                       dry-run pack of the current directory
+dx pack                  pack the current directory to stdout
 ```
 
+Top-level help is selected explicitly with `dx --help`.
 ## 12. Input-output collision
 
 A filesystem input and filesystem output resolving to the same object are rejected for `envelope` and `unwrap`. Envelope v1 provides no in-place mode.
