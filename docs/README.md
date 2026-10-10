@@ -69,7 +69,7 @@ This documentation is written from inside DX Artifacts.
 
 - [Distribution and integration contract](specifications/distribution-and-integration-contract.md) defines the supported product forms and future consumer boundary.
 - [Envelope v1](specifications/envelope-v1.md) defines the first transport envelope.
-- [CLI output contract](specifications/cli-output-contract.md) defines the target stdout-first contract and its activation boundary.
+- [CLI output contract](specifications/cli-output-contract.md) defines the active stdout-first contract.
 
 ### Decisions and delivery
 

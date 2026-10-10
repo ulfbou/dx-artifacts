@@ -2,7 +2,7 @@
 
 ## 1. Status
 
-Proposed prototype specification.
+Accepted and active following WP-06 and WP-07.
 
 ## 2. Purpose
 

@@ -46,7 +46,7 @@ output sink             stdout
 dx envelope [INPUT] [OPTIONS]
 ```
 
-Target defaults after the applicable command and WP-10 gates pass:
+Active defaults:
 
 ```text
 INPUT                   stdin
@@ -61,7 +61,7 @@ logical carrier name    carrier.dx.txt
 dx unwrap [INPUT] [OPTIONS]
 ```
 
-Target defaults after the applicable command and WP-10 gates pass:
+Active defaults:
 
 ```text
 INPUT                   stdin

@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed target contract. Operation reports are not supported until WP-08 and its applicable conformance gate pass.
+Accepted and active following WP-08.
 
 ## 1. Purpose
 
