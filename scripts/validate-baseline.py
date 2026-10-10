@@ -46,8 +46,8 @@ checks = [
         (root / "src/dx_artifacts/verification.py").is_file(),
     ),
     (
-        "no envelope implementation",
-        not (root / "src/dx_artifacts/envelope.py").exists(),
+        "WP-04 envelope reader exists",
+        (root / "src/dx_artifacts/envelope.py").is_file(),
     ),
 ]
 
