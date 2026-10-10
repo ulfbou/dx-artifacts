@@ -41,6 +41,13 @@ from dx_artifacts.errors import (
     VerifyError,
     WriteConflictError,
 )
+from dx_artifacts.envelope import (
+    SUPPORTED_PROFILE,
+    build_canonical_envelope,
+    parse_envelope,
+    verify_canonical_envelope,
+    verify_envelope,
+)
 
 try:
     from collab.filesystem import FilesystemError, atomic_write_text
@@ -481,8 +488,36 @@ def normalize_pack_options(a) -> NormalizedPackOptions:
     root=Path(a.root).resolve() if a.root else (source.parent if source_lex.is_file() or source_lex.is_symlink() else source.resolve())
     if not root.is_dir(): raise UsageError(f"selection root is not a directory: {root}")
     if not _inside(source.resolve(), root): raise UsageError("SOURCE is outside --root")
-    output=Path(a.output_opt) if a.output_opt else resolve_default_output(False, source)
-    if str(output) != "-" and not output.is_absolute(): output=Path.cwd()/output
+    if a.format == "envelope":
+        effective_envelope_profile = (
+            a.envelope_profile or SUPPORTED_PROFILE
+        )
+        if effective_envelope_profile != SUPPORTED_PROFILE:
+            raise UsageError(
+                "unsupported envelope profile: "
+                f"{effective_envelope_profile}"
+            )
+        output = (
+            Path(a.output_opt)
+            if a.output_opt
+            else Path.cwd() / "dx-envelope-1.dx.envelope.txt"
+        )
+    else:
+        if a.envelope_profile is not None:
+            raise UsageError(
+                "--envelope-profile requires --format envelope"
+            )
+        if a.carrier_name is not None:
+            raise UsageError(
+                "--carrier-name requires --format envelope"
+            )
+        output = (
+            Path(a.output_opt)
+            if a.output_opt
+            else resolve_default_output(False, source)
+        )
+    if str(output) != "-" and not output.is_absolute():
+        output = Path.cwd() / output
     mode="only" if a.only else "git" if a.from_git else "path" if a.path else "file" if source_lex.is_file() or source_lex.is_symlink() else "walk"
     inc=tuple(_validate_pattern(x,"include",i,"include") for i,x in enumerate(a.include))
     for rule in inc:
@@ -810,6 +845,283 @@ def publish_artifact(
 
 # ------------------------- Command handlers -------------------------
 
+
+def _read_artifact_bytes(input_path: str) -> bytes:
+    if input_path == "-":
+        try:
+            return sys.stdin.buffer.read()
+        except OSError as exc:
+            raise IOErrorDx(
+                f"cannot read artifact from stdin: {exc}"
+            ) from exc
+
+    path = Path(input_path)
+    if not path.is_file():
+        raise IOErrorDx(
+            f"artifact does not exist: {input_path}"
+        )
+
+    try:
+        return path.read_bytes()
+    except OSError as exc:
+        raise IOErrorDx(
+            f"cannot read artifact {input_path}: {exc}"
+        ) from exc
+
+
+def _parse_carrier_bytes(
+    carrier_bytes: bytes,
+) -> tuple[str, list[Entry], int]:
+    try:
+        text = carrier_bytes.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise InvalidCarrierError(
+            "carrier is not valid UTF-8"
+        ) from exc
+
+    from io import StringIO
+
+    return parse(StringIO(text))
+
+
+def _artifact_output(
+    requested: str | None,
+    default_name: str,
+) -> Path:
+    if requested == "-":
+        return Path("-")
+    if requested is None:
+        return Path.cwd() / default_name
+
+    output = Path(requested)
+    return output if output.is_absolute() else Path.cwd() / output
+
+
+def _validate_artifact_publication(
+    input_path: str,
+    output: Path,
+    force: bool,
+) -> None:
+    if output == Path("-"):
+        if force:
+            raise UsageError(
+                "--force is not valid with stdout"
+            )
+        return
+
+    if input_path != "-":
+        try:
+            same_object = (
+                Path(input_path).resolve()
+                == output.resolve()
+            )
+        except OSError as exc:
+            raise IOErrorDx(
+                "cannot resolve input-output identity: "
+                f"{exc}"
+            ) from exc
+
+        if same_object:
+            raise WriteConflictError(
+                "input and output must be different "
+                "filesystem objects"
+            )
+
+    if output.is_symlink():
+        raise WriteConflictError(
+            f"refusing to replace symlink: {output}"
+        )
+
+    if output.exists() and not force:
+        raise WriteConflictError(
+            "output already exists; use --force to "
+            f"replace it: {output}"
+        )
+
+
+def _publish_artifact_bytes(
+    payload: bytes,
+    output: Path,
+    force: bool,
+) -> None:
+    with ArtifactSpool() as spool:
+        spool.write(payload)
+        spool.rewind()
+        publish_artifact(output, force, spool)
+
+
+def envelope_command(a) -> int:
+    if a.envelope_profile != SUPPORTED_PROFILE:
+        raise UsageError(
+            "unsupported envelope profile: "
+            f"{a.envelope_profile}"
+        )
+
+    output = _artifact_output(
+        a.output_opt,
+        "dx-envelope-1.dx.envelope.txt",
+    )
+    _validate_artifact_publication(
+        a.input,
+        output,
+        a.force,
+    )
+
+    carrier_bytes = _read_artifact_bytes(a.input)
+    _parse_carrier_bytes(carrier_bytes)
+
+    produced = build_canonical_envelope(
+        carrier_bytes,
+        carrier_name=a.carrier_name,
+    )
+    _publish_artifact_bytes(
+        produced.envelope_bytes,
+        output,
+        a.force,
+    )
+
+    if output != Path("-") and not a.quiet:
+        print(
+            f"DX envelope created: {output}",
+            file=sys.stderr,
+        )
+
+    return 0
+
+
+def unwrap_command(a) -> int:
+    output = _artifact_output(
+        a.output_opt,
+        "unwrapped.dx.txt",
+    )
+    _validate_artifact_publication(
+        a.input,
+        output,
+        a.force,
+    )
+
+    verified = verify_envelope(
+        _read_artifact_bytes(a.input)
+    )
+    _parse_carrier_bytes(verified.carrier_bytes)
+    _publish_artifact_bytes(
+        verified.carrier_bytes,
+        output,
+        a.force,
+    )
+
+    if output != Path("-") and not a.quiet:
+        print(
+            f"DX carrier recovered: {output}",
+            file=sys.stderr,
+        )
+
+    return 0
+
+
+def _carrier_verification(
+    artifact_bytes: bytes,
+) -> dict[str, object]:
+    version, entries, notes = _parse_carrier_bytes(
+        artifact_bytes
+    )
+    return {
+        "format": "carrier",
+        "version": version,
+        "policy": "structural",
+        "valid": True,
+        "files": len(entries),
+        "note_blocks": notes,
+    }
+
+
+def _envelope_verification(
+    artifact_bytes: bytes,
+    policy: str,
+) -> dict[str, object]:
+    if policy == "structural":
+        parsed = parse_envelope(artifact_bytes)
+        return {
+            "format": "envelope",
+            "version": parsed.version,
+            "profile": parsed.profile,
+            "policy": policy,
+            "valid": True,
+        }
+
+    if policy == "integrity":
+        verified = verify_envelope(artifact_bytes)
+    elif policy == "canonical":
+        verified = verify_canonical_envelope(
+            artifact_bytes
+        )
+    else:
+        raise UsageError(
+            f"unsupported verification policy: {policy}"
+        )
+
+    _parse_carrier_bytes(verified.carrier_bytes)
+
+    return {
+        "format": "envelope",
+        "version": verified.envelope.version,
+        "profile": verified.envelope.profile,
+        "policy": policy,
+        "valid": True,
+        "carrier_version": (
+            verified.parsed_carrier_version
+        ),
+        "carrier_size": verified.carrier_size,
+        "carrier_sha256": verified.carrier_sha256,
+        "payload_size": verified.zip_size,
+        "payload_sha256": verified.zip_sha256,
+    }
+
+
+def verify_command(a) -> int:
+    artifact_bytes = _read_artifact_bytes(a.input)
+
+    if artifact_bytes.startswith(b"%%DX-ENVELOPE"):
+        result = _envelope_verification(
+            artifact_bytes,
+            a.policy or "integrity",
+        )
+    elif artifact_bytes.startswith(b"%%DX"):
+        policy = a.policy or "structural"
+        if policy != "structural":
+            raise UsageError(
+                "direct carrier verification supports "
+                "only the structural policy"
+            )
+        result = _carrier_verification(
+            artifact_bytes
+        )
+    else:
+        raise InvalidCarrierError(
+            "unrecognized artifact format"
+        )
+
+    if a.json:
+        json.dump(
+            {
+                "schema_version": 1,
+                "command": "verify",
+                **result,
+                "errors": [],
+            },
+            sys.stdout,
+            indent=2,
+        )
+        sys.stdout.write("\n")
+    elif not a.quiet:
+        print(
+            f"{result['format']} "
+            f"{result['policy']} verification OK",
+            file=sys.stderr,
+        )
+
+    return 0
+
 def device_output_dir() -> Path:
     override = os.environ.get("DX_DEVICE_DIR")
     return Path(override).expanduser() if override else DEFAULT_DEVICE_DIR
@@ -863,11 +1175,54 @@ def pack_command(a) -> int:
     if o.output != Path("-"):
         o.output.parent.mkdir(parents=True, exist_ok=True)
     existed = o.output.exists() if o.output != Path("-") else False
-    with build_carrier_spool(selected, o.readonly) as spool:
-        publish_artifact(o.output, o.force, spool)
-    if o.output!=Path("-"):
-        if o.quiet: print(o.output)
-        else: print(f"DX carrier {'replaced' if existed else 'created'}: {o.output}\nIncluded: {len(selected)} files\nSkipped non-UTF-8: {report.filter_counts['binary_skipped']} files\nNext: dx.py inspect \"{o.output}\"",file=sys.stderr)
+
+    with build_carrier_spool(selected, o.readonly) as carrier_spool:
+        carrier_bytes = carrier_spool.complete_bytes()
+        _parse_carrier_bytes(carrier_bytes)
+
+        if a.format == "envelope":
+            produced = build_canonical_envelope(
+                carrier_bytes,
+                carrier_name=(
+                    a.carrier_name or "carrier.dx.txt"
+                ),
+            )
+            verify_canonical_envelope(
+                produced.envelope_bytes
+            )
+            with ArtifactSpool() as artifact_spool:
+                artifact_spool.write(
+                    produced.envelope_bytes
+                )
+                artifact_spool.rewind()
+                publish_artifact(
+                    o.output,
+                    o.force,
+                    artifact_spool,
+                )
+            artifact_label = "DX envelope"
+        else:
+            carrier_spool.rewind()
+            publish_artifact(
+                o.output,
+                o.force,
+                carrier_spool,
+            )
+            artifact_label = "DX carrier"
+
+    if o.output != Path("-"):
+        if o.quiet:
+            print(o.output)
+        else:
+            print(
+                f"{artifact_label} "
+                f"{'replaced' if existed else 'created'}: "
+                f"{o.output}\n"
+                f"Included: {len(selected)} files\n"
+                "Skipped non-UTF-8: "
+                f"{report.filter_counts['binary_skipped']} files",
+                file=sys.stderr,
+            )
     return 0
 
 
@@ -1183,7 +1538,23 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument('-v', '--verbose', action='store_true', help=argparse.SUPPRESS)
     p.add_argument('source', nargs='?', metavar='SOURCE', help='Directory or file to pack (default: current directory)')
     p.add_argument('output', nargs='?', metavar='OUTPUT', help=argparse.SUPPRESS)  # deprecated
-    p.add_argument('-o', '--output', dest='output_opt', help='Output carrier path, or "-" for stdout')
+    p.add_argument('-o', '--output', dest='output_opt', help='Output artifact path, or "-" for stdout')
+    p.add_argument(
+        "--format",
+        choices=("carrier", "envelope"),
+        default="carrier",
+        help="Produced artifact format",
+    )
+    p.add_argument(
+        "--envelope-profile",
+        default=None,
+        help="Envelope profile; requires --format envelope",
+    )
+    p.add_argument(
+        "--carrier-name",
+        default=None,
+        help="Logical enclosed carrier name; requires --format envelope",
+    )
     p.add_argument('-r', '--root', help='Advanced: path mapping root')
     p.add_argument('-p', '--path', action='append', default=[], help='Add a file or recursively discovered directory to the candidate set (repeatable)')
     p.add_argument('-g', '--from-git', action='store_true', help='Add Git worktree changes to the candidate set')
@@ -1222,6 +1593,138 @@ def build_parser() -> argparse.ArgumentParser:
         q.add_argument('-j', '--json', action='store_true', help='Output dry-run plan as JSON')
         q.set_defaults(func=unpack_command if name == 'unpack' else apply_command)
 
+
+    envelope_parser = sub.add_parser(
+        "envelope",
+        help=(
+            "Wrap a verified carrier in a canonical "
+            "DX envelope"
+        ),
+    )
+    envelope_parser.add_argument(
+        "-q",
+        "--quiet",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
+    envelope_parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
+    envelope_parser.add_argument(
+        "input",
+        metavar="INPUT",
+        help='Carrier file or "-" for stdin',
+    )
+    envelope_parser.add_argument(
+        "--envelope-profile",
+        default=SUPPORTED_PROFILE,
+        choices=(SUPPORTED_PROFILE,),
+        help="Envelope profile",
+    )
+    envelope_parser.add_argument(
+        "--carrier-name",
+        default="carrier.dx.txt",
+        help="Logical enclosed carrier basename",
+    )
+    envelope_parser.add_argument(
+        "-o",
+        "--output",
+        dest="output_opt",
+        help='Output envelope path, or "-" for stdout',
+    )
+    envelope_parser.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        help="Replace an existing filesystem output",
+    )
+    envelope_parser.set_defaults(
+        func=envelope_command
+    )
+
+    unwrap_parser = sub.add_parser(
+        "unwrap",
+        help=(
+            "Recover exact carrier bytes from a "
+            "DX envelope"
+        ),
+    )
+    unwrap_parser.add_argument(
+        "-q",
+        "--quiet",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
+    unwrap_parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
+    unwrap_parser.add_argument(
+        "input",
+        metavar="INPUT",
+        help='Envelope file or "-" for stdin',
+    )
+    unwrap_parser.add_argument(
+        "-o",
+        "--output",
+        dest="output_opt",
+        help='Output carrier path, or "-" for stdout',
+    )
+    unwrap_parser.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        help="Replace an existing filesystem output",
+    )
+    unwrap_parser.set_defaults(
+        func=unwrap_command
+    )
+
+    verify_parser = sub.add_parser(
+        "verify",
+        help="Verify a DX carrier or envelope",
+    )
+    verify_parser.add_argument(
+        "-q",
+        "--quiet",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
+    verify_parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
+    verify_parser.add_argument(
+        "input",
+        metavar="INPUT",
+        help='Artifact file or "-" for stdin',
+    )
+    verify_parser.add_argument(
+        "--policy",
+        choices=(
+            "structural",
+            "integrity",
+            "canonical",
+        ),
+        help="Verification policy",
+    )
+    verify_parser.add_argument(
+        "-j",
+        "--json",
+        action="store_true",
+        help="Write one verification result as JSON",
+    )
+    verify_parser.set_defaults(
+        func=verify_command
+    )
+
     # inspect
     insp = sub.add_parser('inspect', help='Inspect a DX carrier')
     insp.add_argument('-q', '--quiet', action='store_true', help=argparse.SUPPRESS)
@@ -1253,6 +1756,9 @@ Commands:
   unpack     Extract files from a carrier
   apply      Alias for unpack
   inspect    Inspect a carrier
+  envelope   Wrap a carrier in a canonical envelope
+  unwrap     Recover exact carrier bytes from an envelope
+  verify     Verify a carrier or envelope
 
 Quick start:
   dx.py pack
@@ -1279,7 +1785,18 @@ def main(argv=None):
     global_verbose = any(arg in ("-v", "--verbose") for arg in argsv)
     normalized_args = [arg for arg in argsv if arg not in ("-q", "--quiet", "-v", "--verbose")]
 
-    commands = {'pack', 'p', 'unpack', 'u', 'apply', 'a', 'inspect'}
+    commands = {
+        'pack',
+        'p',
+        'unpack',
+        'u',
+        'apply',
+        'a',
+        'inspect',
+        'envelope',
+        'unwrap',
+        'verify',
+    }
     if (len(normalized_args) >= 2 and normalized_args[0] in commands
             and normalized_args[1] == normalized_args[0]):
         print(
@@ -1345,6 +1862,9 @@ def main(argv=None):
             'apply': 'dx.py apply CARRIER [DESTINATION] [OPTIONS]',
             'a': 'dx.py apply CARRIER [DESTINATION] [OPTIONS]',
             'inspect': 'dx.py inspect CARRIER [OPTIONS]',
+            'envelope': 'dx.py envelope INPUT [OPTIONS]',
+            'unwrap': 'dx.py unwrap INPUT [OPTIONS]',
+            'verify': 'dx.py verify INPUT [OPTIONS]',
         }
         if command in usage_map:
             print(f"Usage:\n  {usage_map[command]}", file=sys.stderr)
@@ -1364,6 +1884,9 @@ def main(argv=None):
             'apply': 'dx.py apply CARRIER [DESTINATION] [OPTIONS]',
             'a': 'dx.py apply CARRIER [DESTINATION] [OPTIONS]',
             'inspect': 'dx.py inspect CARRIER [OPTIONS]',
+            'envelope': 'dx.py envelope INPUT [OPTIONS]',
+            'unwrap': 'dx.py unwrap INPUT [OPTIONS]',
+            'verify': 'dx.py verify INPUT [OPTIONS]',
         }
         if command in usage_map:
             print(f"Usage:\n  {usage_map[command]}", file=sys.stderr)
