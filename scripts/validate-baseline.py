@@ -78,6 +78,17 @@ checks = [
             / "tests/test_wp08_operation_reports.py"
         ).is_file(),
     ),
+    (
+        "WP-09 capability discovery exists",
+        (
+            root
+            / "src/dx_artifacts/capabilities.py"
+        ).is_file()
+        and (
+            root
+            / "tests/test_wp09_capabilities_cli.py"
+        ).is_file(),
+    ),
 ]
 
 for name, passed in checks:

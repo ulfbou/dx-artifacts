@@ -34,7 +34,7 @@ def test_wp04_adds_reader_without_writer_or_cli_activation():
     assert "envelope_command" in dx_source
     assert "unwrap_command" in dx_source
     assert "verify_command" in dx_source
-    assert "capabilities_command" not in dx_source
+    assert "capabilities_command" in dx_source
 
 
 def test_wp04_does_not_export_an_envelope_api_yet():
