@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed.
+Accepted and implemented by WP-07.
 
 ## Context
 

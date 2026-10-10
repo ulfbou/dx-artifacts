@@ -2,7 +2,7 @@
 
 ## 1. Status
 
-Proposed implementation profile for DX envelope v1.
+Accepted and active following WP-05.
 
 ## 2. Profile identity
 

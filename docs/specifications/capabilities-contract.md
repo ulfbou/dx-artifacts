@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed target contract. Capability output is unavailable until its implementation and conformance gates pass.
+Accepted and active following WP-09.
 
 ## 1. Purpose
 

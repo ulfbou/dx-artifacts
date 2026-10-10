@@ -39,7 +39,7 @@ dx envelope [INPUT] [--envelope-profile canonical-v1]
                [--carrier-name NAME] [-o OUTPUT] [--report FILE]
 ```
 
-Target defaults after the applicable command and WP-10 gates pass:
+Active defaults:
 
 ```text
 INPUT           stdin
@@ -56,7 +56,7 @@ Input carrier verification precedes transformation.
 dx unwrap [INPUT] [-o OUTPUT] [--report FILE]
 ```
 
-After the applicable command and WP-10 gates pass, input defaults to stdin and output defaults to stdout. It performs integrity verification and emits exact carrier bytes.
+Input defaults to stdin and output defaults to stdout. Unwrap performs integrity verification and emits exact carrier bytes.
 
 ## 5. `verify`
 
@@ -77,7 +77,7 @@ dx capabilities --json
 
 Only implemented and conformance-gated features are advertised.
 
-## 7. Target sink options
+## 7. Active sink options
 
 The following rules are active:
 
