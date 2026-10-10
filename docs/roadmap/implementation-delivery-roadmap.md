@@ -34,7 +34,7 @@ Includes WP-08 and WP-09. Exit evidence proves exact reports and truthful capabi
 
 ## 9. Compatibility activation boundary
 
-Includes WP-10. Stdout becomes the omitted-output default only when the separately defined compatibility gate passes.
+Completed by WP-10. Stdout is the omitted-output default for artifact-producing commands and the compatibility gate is executable.
 
 ## 10. Consumer-ready release boundary
 

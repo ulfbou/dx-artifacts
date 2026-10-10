@@ -71,16 +71,3 @@ def test_filesystem_sink_preserves_conflict_exit_category(
     assert conflict.returncode == 5
     assert b"use --force" in conflict.stderr
     assert replacement.returncode == 0
-
-
-def test_omitted_output_still_uses_numbered_filesystem_sink(
-    run_dx,
-    tmp_path,
-):
-    (tmp_path / "a.txt").write_bytes(b"a\n")
-
-    result = run_dx("pack", ".", cwd=tmp_path)
-
-    assert result.returncode == 0
-    assert result.stdout == b""
-    assert (tmp_path / "dx-carrier-1.dx.txt").is_file()

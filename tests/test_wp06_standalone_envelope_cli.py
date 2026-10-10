@@ -67,26 +67,6 @@ def test_envelope_filesystem_equals_stdout(
     assert output.read_bytes() == stdout.stdout
 
 
-def test_envelope_omitted_output_preserves_pre_wp10_default(
-    run_dx,
-    tmp_path,
-):
-    result = run_dx(
-        "envelope",
-        str(CARRIER),
-        "--carrier-name",
-        "mixed.dx.txt",
-        cwd=tmp_path,
-    )
-
-    output = (
-        tmp_path / "dx-envelope-1.dx.envelope.txt"
-    )
-    assert result.returncode == 0
-    assert result.stdout == b""
-    assert output.read_bytes() == ENVELOPE.read_bytes()
-
-
 def test_unwrap_stdout_is_exact(
     run_dx,
     tmp_path,
@@ -352,28 +332,3 @@ def test_destination_symlink_is_rejected(
 
     assert result.returncode == 5
     assert target.read_bytes() == b"target"
-
-
-def test_wp10_remains_inactive(
-    run_dx,
-    tmp_path,
-):
-    capabilities = run_dx(
-        "capabilities",
-        "--json",
-        cwd=tmp_path,
-    )
-
-    assert capabilities.returncode == 0
-    payload = json.loads(capabilities.stdout)
-    assert payload["schema_version"] == 1
-    assert "stdout_default" not in json.dumps(
-        payload,
-        sort_keys=True,
-    )
-
-    dx_source = (ROOT / "dx.py").read_text(
-        encoding="utf-8"
-    )
-    assert "--report" in dx_source
-    assert "capabilities_command" in dx_source

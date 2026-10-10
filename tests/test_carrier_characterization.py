@@ -12,13 +12,6 @@ def test_pack_explicit_stdout_and_inspect(run_dx, tmp_path):
     assert listed.stdout.splitlines() == [b"a.txt"]
 
 
-def test_omitted_output_is_numbered_file(run_dx, tmp_path):
-    (tmp_path / "a.txt").write_text("a", encoding="utf-8")
-    r = run_dx("pack", ".", cwd=tmp_path)
-    assert r.returncode == 0
-    assert (tmp_path / "dx-carrier-1.dx.txt").is_file()
-
-
 def test_force_conflict(run_dx, tmp_path):
     (tmp_path / "a.txt").write_text("a", encoding="utf-8")
     out = tmp_path / "out.dx.txt"

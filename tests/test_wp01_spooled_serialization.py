@@ -49,13 +49,3 @@ def test_spooled_filesystem_and_stdout_outputs_are_identical(
     assert filesystem.returncode == 0
     assert stdout.returncode == 0
     assert output.read_bytes() == stdout.stdout
-
-
-def test_omitted_output_behavior_remains_numbered(run_dx, tmp_path):
-    (tmp_path / "a.txt").write_bytes(b"a\n")
-
-    result = run_dx("pack", ".", cwd=tmp_path)
-
-    assert result.returncode == 0
-    assert result.stdout == b""
-    assert (tmp_path / "dx-carrier-1.dx.txt").is_file()

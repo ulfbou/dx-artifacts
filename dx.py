@@ -510,8 +510,8 @@ def normalize_pack_options(a) -> NormalizedPackOptions:
             )
         output = (
             Path(a.output_opt)
-            if a.output_opt
-            else Path.cwd() / "dx-envelope-1.dx.envelope.txt"
+            if a.output_opt is not None
+            else Path("-")
         )
     else:
         if a.envelope_profile is not None:
@@ -524,11 +524,13 @@ def normalize_pack_options(a) -> NormalizedPackOptions:
             )
         output = (
             Path(a.output_opt)
-            if a.output_opt
-            else resolve_default_output(False, source)
+            if a.output_opt is not None
+            else Path("-")
         )
     if str(output) != "-" and not output.is_absolute():
         output = Path.cwd() / output
+    if output == Path("-") and a.force:
+        raise UsageError("--force is not valid with stdout")
     mode="only" if a.only else "git" if a.from_git else "path" if a.path else "file" if source_lex.is_file() or source_lex.is_symlink() else "walk"
     inc=tuple(_validate_pattern(x,"include",i,"include") for i,x in enumerate(a.include))
     for rule in inc:
@@ -978,16 +980,12 @@ def _parse_carrier_bytes(
 
 
 def _artifact_output(
-    requested: str | None,
-    default_name: str,
-) -> Path:
-    if requested == "-":
-        return Path("-")
-    if requested is None:
-        return Path.cwd() / default_name
-
-    output = Path(requested)
-    return output if output.is_absolute() else Path.cwd() / output
+      requested: str | None,
+  ) -> Path:
+      if requested is None or requested == "-":
+          return Path("-")
+      output = Path(requested)
+      return output if output.is_absolute() else Path.cwd() / output
 
 
 def _validate_artifact_publication(
@@ -1050,10 +1048,7 @@ def envelope_command(a) -> int:
             f"{a.envelope_profile}"
         )
 
-    output = _artifact_output(
-        a.output_opt,
-        "dx-envelope-1.dx.envelope.txt",
-    )
+    output = _artifact_output(a.output_opt)
     _validate_artifact_publication(
         a.input,
         output,
@@ -1118,10 +1113,7 @@ def envelope_command(a) -> int:
 
 
 def unwrap_command(a) -> int:
-    output = _artifact_output(
-        a.output_opt,
-        "unwrapped.dx.txt",
-    )
+    output = _artifact_output(a.output_opt)
     _validate_artifact_publication(
         a.input,
         output,
@@ -1770,12 +1762,12 @@ def build_parser() -> argparse.ArgumentParser:
     # pack
     p = sub.add_parser('pack', aliases=['p'], help='Pack files into a DX carrier',
                        formatter_class=argparse.RawDescriptionHelpFormatter,
-                       description='Pack files. With no arguments, defaults to --dry-run of current directory.')
+                       description='Pack files. Omitted output writes artifact bytes to stdout.')
     p.add_argument('-q', '--quiet', action='store_true', help=argparse.SUPPRESS)
     p.add_argument('-v', '--verbose', action='store_true', help=argparse.SUPPRESS)
     p.add_argument('source', nargs='?', metavar='SOURCE', help='Directory or file to pack (default: current directory)')
     p.add_argument('output', nargs='?', metavar='OUTPUT', help=argparse.SUPPRESS)  # deprecated
-    p.add_argument('-o', '--output', dest='output_opt', help='Output artifact path, or "-" for stdout')
+    p.add_argument('-o', '--output', dest='output_opt', help='Output artifact path; omitted or "-" writes to stdout')
     p.add_argument(
         "--report",
         help="Write a machine-readable operation report",
@@ -1874,7 +1866,7 @@ def build_parser() -> argparse.ArgumentParser:
         "-o",
         "--output",
         dest="output_opt",
-        help='Output envelope path, or "-" for stdout',
+        help='Output envelope path; omitted or "-" writes to stdout',
     )
     envelope_parser.add_argument(
         "-f",
@@ -1918,7 +1910,7 @@ def build_parser() -> argparse.ArgumentParser:
         "-o",
         "--output",
         dest="output_opt",
-        help='Output carrier path, or "-" for stdout',
+        help='Output carrier path; omitted or "-" writes to stdout',
     )
     unwrap_parser.add_argument(
         "-f",

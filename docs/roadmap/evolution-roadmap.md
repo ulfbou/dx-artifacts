@@ -56,7 +56,7 @@ Add explicit operation reports and truthful machine-readable capability discover
 
 ## 11. Stage 8: Stdout-default compatibility activation
 
-Activate ADR-002 only after its compatibility gate passes. Before this stage, omitted-`-o` behavior remains the accepted bootstrap behavior.
+Completed by WP-10. Omitted `-o` selects stdout for artifact-producing commands, while `-o FILE` retains controlled filesystem publication.
 
 ## 12. Stage 9: Consumer-ready distribution
 

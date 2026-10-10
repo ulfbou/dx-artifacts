@@ -2,7 +2,7 @@
 
 ## Status
 
-Target contract. Bootstrap and behavior-preserving decomposition retain the accepted baseline CLI behavior. Stdout-default behavior becomes active only when WP-10 passes its compatibility gate.
+Accepted contract. Stdout-default behavior is active following WP-10.
 
 ## Command notation
 
@@ -20,7 +20,7 @@ dx pack [SOURCE] [selection options] [--format carrier|envelope]
            [--carrier-name NAME] [-o OUTPUT] [--report FILE]
 ```
 
-Target defaults after WP-10 activation:
+Active defaults:
 
 ```text
 SOURCE          .
@@ -79,7 +79,7 @@ Only implemented and conformance-gated features are advertised.
 
 ## 7. Target sink options
 
-The following rules become active at WP-10:
+The following rules are active:
 
 - Omitted `-o` and `-o -` select stdout.
 - `-o FILE` selects atomic filesystem publication.

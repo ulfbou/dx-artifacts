@@ -116,28 +116,6 @@ def test_integrated_stdout_and_filesystem_are_identical(
     assert output.read_bytes() == stdout.stdout
 
 
-def test_integrated_omitted_output_preserves_pre_wp10_filesystem_default(
-    run_dx,
-    tmp_path,
-):
-    result = run_dx(
-        "pack",
-        str(SOURCE),
-        "--format",
-        "envelope",
-        "--carrier-name",
-        "mixed.dx.txt",
-        cwd=tmp_path,
-    )
-    output = (
-        tmp_path / "dx-envelope-1.dx.envelope.txt"
-    )
-
-    assert result.returncode == 0
-    assert result.stdout == b""
-    assert output.is_file()
-
-
 def test_carrier_format_remains_default_and_byte_identical(
     run_dx,
     tmp_path,
@@ -228,28 +206,3 @@ def test_invalid_integrated_carrier_name_is_rejected(
     )
 
     assert result.returncode == 3
-
-
-def test_wp10_remains_inactive(
-    run_dx,
-    tmp_path,
-):
-    capabilities = run_dx(
-        "capabilities",
-        "--json",
-        cwd=tmp_path,
-    )
-
-    assert capabilities.returncode == 0
-    payload = json.loads(capabilities.stdout)
-    assert payload["schema_version"] == 1
-    assert "stdout_default" not in json.dumps(
-        payload,
-        sort_keys=True,
-    )
-
-    dx_source = (ROOT / "dx.py").read_text(
-        encoding="utf-8"
-    )
-    assert "--report" in dx_source
-    assert "capabilities_command" in dx_source

@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed target contract. This document does not change the accepted bootstrap CLI behavior. Stdout-default behavior becomes active only after ADR-002 is accepted for activation and WP-10 passes.
+Accepted and active following WP-10.
 
 ## Command notation
 
@@ -16,7 +16,7 @@ envelope
 unwrap
 ```
 
-After WP-10 activation, these commands follow:
+These commands follow:
 
 ```text
 No -o supplied     → stdout
@@ -30,7 +30,7 @@ No -o supplied     → stdout
 dx pack [SOURCE] [OPTIONS]
 ```
 
-Target defaults after WP-10 activation:
+Active defaults:
 
 ```text
 SOURCE                  .
