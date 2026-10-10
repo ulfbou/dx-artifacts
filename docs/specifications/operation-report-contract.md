@@ -37,25 +37,29 @@ A version 1 report contains:
     "size": 1234,
     "sha256": "<64 lowercase hexadecimal characters>"
   },
-  "representation": null,
-  "verification": {
-    "policy": "structural",
-    "passed": true,
-    "failures": []
-  },
+  "representations": [],
+  "verification": [
+    {
+      "policy": "structural",
+      "passed": true,
+      "layer": "carrier"
+    }
+  ],
   "delivery": {
     "sink": "filesystem",
-    "completed": true
+    "completed": true,
+    "bytes_written": 1234,
+    "destination": "artifact.dx.txt"
   },
-  "diagnostics": []
+  "errors": []
 }
 ```
 
 ## 4. Artifact and representation
 
-`artifact` describes the logical produced artifact bytes before optional transport transformation.
+`artifact` describes the exact bytes delivered by the selected artifact sink. A carrier-producing operation records the carrier; envelope production records the envelope; unwrap records the recovered carrier.
 
-`representation` describes transformed output when present. For an envelope operation it records envelope media type, envelope version, profile, size, and SHA-256.
+`representations` is an array of exact intermediate or enclosed representations evidenced by the operation. Current envelope production records the inner carrier and canonical ZIP representation. Current unwrap reports the input envelope as a representation.
 
 Reports do not duplicate transported file content.
 
@@ -71,9 +75,9 @@ For stdout, a broken pipe prevents successful completed delivery.
 
 The report names the applied policy and records failures by layer. A later-layer success must not be reported when an earlier layer failed.
 
-## 7. Diagnostics
+## 7. Errors
 
-Diagnostics are structured objects with stable codes and human-readable messages. Paths, when included, use workspace-relative or explicitly labeled filesystem forms.
+The `errors` array contains structured error objects with stable codes and human-readable messages. Paths, when included, use workspace-relative or explicitly labeled filesystem forms. A successful version 1 report contains an empty `errors` array.
 
 ## 8. Failure reports
 

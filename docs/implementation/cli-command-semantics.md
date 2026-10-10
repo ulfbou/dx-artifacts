@@ -6,7 +6,7 @@ Accepted contract. Stdout-default behavior is active following WP-10.
 
 ## Command notation
 
-`dx` is the canonical product command. `python -m dx_artifacts` is the equivalent module form. `python dx.py` is the standalone release form. The examples below use `dx`.
+The currently implemented repository entry point is `python dx.py`. The `dx` console command, `python -m dx_artifacts`, a supported Python API, and a generated standalone release artifact remain WP-11 distribution forms and are not current interfaces. Command examples use `dx` as contract notation for the future canonical product command unless a current invocation is being demonstrated.
 
 ## 1. Normalization
 
@@ -35,14 +35,14 @@ Carrier production and integrated envelope production share the same selection a
 ## 3. `envelope`
 
 ```text
-dx envelope [INPUT] [--envelope-profile canonical-v1]
+dx envelope INPUT [--envelope-profile canonical-v1]
                [--carrier-name NAME] [-o OUTPUT] [--report FILE]
 ```
 
 Active defaults:
 
 ```text
-INPUT           stdin
+INPUT           required; `-` selects stdin
 output          stdout
 profile         canonical-v1
 carrier name    carrier.dx.txt
@@ -53,15 +53,15 @@ Input carrier verification precedes transformation.
 ## 4. `unwrap`
 
 ```text
-dx unwrap [INPUT] [-o OUTPUT] [--report FILE]
+dx unwrap INPUT [-o OUTPUT] [--report FILE]
 ```
 
-Input defaults to stdin and output defaults to stdout. Unwrap performs integrity verification and emits exact carrier bytes.
+Input is required; `-` selects stdin. Output defaults to stdout. Unwrap performs integrity verification and emits exact carrier bytes.
 
 ## 5. `verify`
 
 ```text
-dx verify [INPUT] [--policy structural|integrity|canonical]
+dx verify INPUT [--policy structural|integrity|canonical]
              [--json]
 ```
 
@@ -89,16 +89,15 @@ The following rules are active:
 
 ## 8. Diagnostics
 
-Successful artifact production is silent by default. `--verbose` adds stderr diagnostics. `--quiet` suppresses non-error diagnostics.
+Artifact stdout contains artifact bytes only. Stdout publication is silent on stderr by default. Successful filesystem publication writes a completion summary to stderr by default. For `pack -q -o FILE`, stdout contains the output path; for other current artifact-producing commands, `--quiet` suppresses the completion summary. `--verbose` currently adds per-file write diagnostics for `unpack` and `apply`; it does not promise expanded diagnostics for every command.
 
-No execution path writes diagnostics to artifact stdout.
+No artifact-producing execution path mixes diagnostics with artifact bytes on stdout.
 
-## 9. Dry-run and check
+## 9. Dry-run and internal check sink
 
 `--dry-run` validates options and selection without claiming exact artifact identity.
 
-`--check` constructs and verifies exact bytes through a check sink. It publishes no artifact and may produce an explicit operation report.
-
+The implementation has an internal check sink that consumes complete artifact bytes without publication. No public `--check` CLI option is currently implemented.
 ## 10. Backward-compatibility transition
 
-Changing omitted `-o` from numbered-file output to stdout is a public CLI change. The implementation must introduce it through an accepted release decision, update help and tests, and provide an explicit replacement for any retained numbered-output convenience.
+WP-10 changed omitted `-o` from numbered-file output to stdout through ADR-002. Help, tests, and capability discovery record the active behavior. Controlled filesystem publication remains available through explicit `-o FILE`.

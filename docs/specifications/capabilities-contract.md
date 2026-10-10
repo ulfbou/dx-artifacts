@@ -29,7 +29,7 @@ Array ordering is deterministic.
   "schema_version": 1,
   "tool": {
     "name": "dx-artifacts",
-    "software_version": "unreleased"
+    "software_version": "0.0.0"
   },
   "carrier": {
     "read_versions": ["v1.3.1", "v2.0.0"],
@@ -53,11 +53,17 @@ Array ordering is deterministic.
     "inspect",
     "verify",
     "capabilities"
-  ]
+  ],
+  "artifact_output": {
+    "default_sink": "stdout",
+    "explicit_stdout": "-",
+    "filesystem_option": "-o FILE",
+    "commands": ["pack", "envelope", "unwrap"]
+  }
 }
 ```
 
-Values in this example are target-state examples. `unreleased` identifies the pre-release documentation state and is not a release version. A released implementation reports its actual software release version. Carrier, envelope, profile, report-schema, and capability-schema identities remain independent. Implementations report only capabilities they actually provide.
+This is the current schema-1 shape. `0.0.0` is the implemented pre-release software identity, not a carrier, envelope, profile, report-schema, or capability-schema version. Those identities remain independent. Implementations report only capabilities they actually provide.
 
 ## 5. Truthfulness requirement
 

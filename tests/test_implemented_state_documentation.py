@@ -56,16 +56,21 @@ REQUIRED_MARKERS = {
     ),
     "docs/implementation/cli-command-semantics.md": (
         "## 7. Active sink options",
-        "Input defaults to stdin and output defaults to stdout.",
+        "Input is required; `-` selects stdin. Output defaults to stdout.",
     ),
     "docs/specifications/cli-output-contract.md": (
         "Accepted and active following WP-10.",
     ),
     "docs/specifications/capabilities-contract.md": (
         "Accepted and active following WP-09.",
+        '"software_version": "0.0.0"',
+        '"artifact_output": {',
     ),
     "docs/specifications/operation-report-contract.md": (
         "Accepted and active following WP-08.",
+        "`artifact` describes the exact bytes delivered",
+        "`representations` is an array",
+        "The `errors` array contains structured error objects",
     ),
     "docs/specifications/envelope-v1.md": (
         "Accepted and active following WP-06 and WP-07.",
