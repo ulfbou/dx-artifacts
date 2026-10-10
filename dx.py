@@ -40,6 +40,9 @@ from dx_artifacts.reports import (
     VerificationEvidence,
     publish_report,
 )
+from dx_artifacts.capabilities import (
+    serialize_capabilities,
+)
 from dx_artifacts.errors import (
     DxError,
     EmptySelectionError,
@@ -1277,6 +1280,34 @@ def verify_command(a) -> int:
 
     return 0
 
+def capabilities_command(a) -> int:
+    if not a.json:
+        raise UsageError(
+            "capabilities requires --json"
+        )
+
+    payload = serialize_capabilities()
+
+    try:
+        written = sys.stdout.buffer.write(payload)
+        if written is None:
+            written = len(payload)
+        if written != len(payload):
+            raise IOErrorDx(
+                "capabilities stdout accepted only part "
+                "of the JSON document"
+            )
+        sys.stdout.buffer.flush()
+    except BrokenPipeError:
+        raise
+    except OSError as exc:
+        raise IOErrorDx(
+            f"cannot write capabilities JSON: {exc}"
+        ) from exc
+
+    return 0
+
+
 def device_output_dir() -> Path:
     override = os.environ.get("DX_DEVICE_DIR")
     return Path(override).expanduser() if override else DEFAULT_DEVICE_DIR
@@ -1943,6 +1974,31 @@ def build_parser() -> argparse.ArgumentParser:
         func=verify_command
     )
 
+    capabilities_parser = sub.add_parser(
+        "capabilities",
+        help="Report conformance-gated capabilities",
+    )
+    capabilities_parser.add_argument(
+        "-q",
+        "--quiet",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
+    capabilities_parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
+    capabilities_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Write one capabilities JSON document",
+    )
+    capabilities_parser.set_defaults(
+        func=capabilities_command
+    )
+
     # inspect
     insp = sub.add_parser('inspect', help='Inspect a DX carrier')
     insp.add_argument('-q', '--quiet', action='store_true', help=argparse.SUPPRESS)
@@ -1977,6 +2033,7 @@ Commands:
   envelope   Wrap a carrier in a canonical envelope
   unwrap     Recover exact carrier bytes from an envelope
   verify     Verify a carrier or envelope
+  capabilities  Report supported capabilities
 
 Quick start:
   dx.py pack
@@ -2014,6 +2071,7 @@ def main(argv=None):
         'envelope',
         'unwrap',
         'verify',
+        'capabilities',
     }
     if (len(normalized_args) >= 2 and normalized_args[0] in commands
             and normalized_args[1] == normalized_args[0]):
@@ -2083,6 +2141,7 @@ def main(argv=None):
             'envelope': 'dx.py envelope INPUT [OPTIONS]',
             'unwrap': 'dx.py unwrap INPUT [OPTIONS]',
             'verify': 'dx.py verify INPUT [OPTIONS]',
+            'capabilities': 'dx.py capabilities --json',
         }
         if command in usage_map:
             print(f"Usage:\n  {usage_map[command]}", file=sys.stderr)
@@ -2105,6 +2164,7 @@ def main(argv=None):
             'envelope': 'dx.py envelope INPUT [OPTIONS]',
             'unwrap': 'dx.py unwrap INPUT [OPTIONS]',
             'verify': 'dx.py verify INPUT [OPTIONS]',
+            'capabilities': 'dx.py capabilities --json',
         }
         if command in usage_map:
             print(f"Usage:\n  {usage_map[command]}", file=sys.stderr)

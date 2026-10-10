@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 
@@ -229,7 +230,7 @@ def test_invalid_integrated_carrier_name_is_rejected(
     assert result.returncode == 3
 
 
-def test_wp09_and_wp10_remain_inactive(
+def test_wp10_remains_inactive(
     run_dx,
     tmp_path,
 ):
@@ -239,10 +240,16 @@ def test_wp09_and_wp10_remain_inactive(
         cwd=tmp_path,
     )
 
-    assert capabilities.returncode == 2
+    assert capabilities.returncode == 0
+    payload = json.loads(capabilities.stdout)
+    assert payload["schema_version"] == 1
+    assert "stdout_default" not in json.dumps(
+        payload,
+        sort_keys=True,
+    )
 
     dx_source = (ROOT / "dx.py").read_text(
         encoding="utf-8"
     )
     assert "--report" in dx_source
-    assert "capabilities_command" not in dx_source
+    assert "capabilities_command" in dx_source

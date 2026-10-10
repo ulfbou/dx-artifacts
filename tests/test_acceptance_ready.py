@@ -17,6 +17,7 @@ def test_wp01_scope_has_no_product_evolution():
     assert "def unwrap_command" in dx
     assert "def verify_command" in dx
     assert "--format" in dx
+    assert "def capabilities_command" in dx
 
 
 def test_accepted_monolith_is_preserved_as_immutable_evidence():

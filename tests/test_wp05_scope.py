@@ -41,7 +41,7 @@ def test_wp05_writer_remains_present_after_wp07_activation():
         assert marker in dx_source
 
     assert "--report" in dx_source
-    assert "capabilities_command" not in dx_source
+    assert "capabilities_command" in dx_source
 
     package_source = (
         ROOT / "src/dx_artifacts/__init__.py"

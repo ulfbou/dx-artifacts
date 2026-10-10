@@ -354,7 +354,7 @@ def test_destination_symlink_is_rejected(
     assert target.read_bytes() == b"target"
 
 
-def test_wp09_and_wp10_are_not_activated(
+def test_wp10_remains_inactive(
     run_dx,
     tmp_path,
 ):
@@ -364,10 +364,16 @@ def test_wp09_and_wp10_are_not_activated(
         cwd=tmp_path,
     )
 
-    assert capabilities.returncode == 2
+    assert capabilities.returncode == 0
+    payload = json.loads(capabilities.stdout)
+    assert payload["schema_version"] == 1
+    assert "stdout_default" not in json.dumps(
+        payload,
+        sort_keys=True,
+    )
 
     dx_source = (ROOT / "dx.py").read_text(
         encoding="utf-8"
     )
     assert "--report" in dx_source
-    assert "capabilities_command" not in dx_source
+    assert "capabilities_command" in dx_source
