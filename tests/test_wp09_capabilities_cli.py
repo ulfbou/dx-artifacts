@@ -39,6 +39,12 @@ EXPECTED = {
         "verify",
         "capabilities",
     ],
+    "artifact_output": {
+        "default_sink": "stdout",
+        "explicit_stdout": "-",
+        "filesystem_option": "-o FILE",
+        "commands": ["pack", "envelope", "unwrap"],
+    },
 }
 
 
@@ -222,25 +228,3 @@ def test_advertised_verification_policies_execute(
         assert json.loads(result.stdout)["policy"] == (
             policy
         )
-
-
-def test_planned_wp10_behavior_is_not_advertised(
-    run_dx,
-    tmp_path,
-):
-    result = run_dx(
-        "capabilities",
-        "--json",
-        cwd=tmp_path,
-    )
-    payload = json.loads(result.stdout)
-
-    encoded = json.dumps(
-        payload,
-        sort_keys=True,
-    )
-
-    assert "stdout_default" not in encoded
-    assert "default_output_sink" not in encoded
-    assert "check" not in encoded
-    assert "consumer-ready" not in encoded

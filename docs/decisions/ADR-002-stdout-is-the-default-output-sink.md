@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed. Not active during bootstrap or behavior-preserving decomposition.
+Accepted and activated by WP-10.
 
 ## Context
 
@@ -10,7 +10,7 @@ Artifact bytes do not require a destination path for identity. Pipeline composit
 
 ## Decision
 
-When this decision is activated at WP-10, artifact-producing commands treat omitted `-o` and `-o -` as stdout. `-o FILE` selects controlled filesystem publication.
+With WP-10 activated, artifact-producing commands treat omitted `-o` and `-o -` as stdout. `-o FILE` selects controlled filesystem publication.
 
 ## Consequences
 

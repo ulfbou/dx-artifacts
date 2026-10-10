@@ -90,7 +90,7 @@ Add truthful `capabilities --json` output that advertises only conformance-gated
 
 ## 15. WP-10: Stdout-default compatibility activation
 
-Change omitted output for artifact-producing commands to stdout only after the compatibility decision, help, migration guidance, and acceptance evidence pass. Preserve `-o FILE` publication.
+Status: completed. Omitted output for artifact-producing commands is stdout. Explicit `-o FILE` publication remains atomic and symlink-safe.
 
 ## 16. WP-11: Consumer-ready distribution
 

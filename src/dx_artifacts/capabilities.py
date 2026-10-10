@@ -60,6 +60,7 @@ class Capabilities:
     verification_policies: tuple[str, ...]
     digests: tuple[str, ...]
     commands: tuple[str, ...]
+    artifact_output: dict[str, object]
 
     def to_json(self) -> dict[str, Any]:
         return {
@@ -86,6 +87,7 @@ class Capabilities:
             ),
             "digests": list(self.digests),
             "commands": list(self.commands),
+            "artifact_output": dict(self.artifact_output),
         }
 
 
@@ -104,6 +106,12 @@ def current_capabilities() -> Capabilities:
         verification_policies=VERIFICATION_POLICIES,
         digests=DIGESTS,
         commands=COMMANDS,
+        artifact_output={
+            "default_sink": "stdout",
+            "explicit_stdout": "-",
+            "filesystem_option": "-o FILE",
+            "commands": ["pack", "envelope", "unwrap"],
+        },
     )
 
 

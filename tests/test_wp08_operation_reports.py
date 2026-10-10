@@ -281,27 +281,3 @@ def test_report_symlink_is_rejected(
     assert target.read_text(encoding="utf-8") == (
         "original"
     )
-
-
-def test_wp10_remains_inactive(
-    run_dx,
-    tmp_path,
-):
-    capabilities = run_dx(
-        "capabilities",
-        "--json",
-        cwd=tmp_path,
-    )
-
-    assert capabilities.returncode == 0
-    payload = json.loads(capabilities.stdout)
-    assert payload["schema_version"] == 1
-    assert "stdout_default" not in json.dumps(
-        payload,
-        sort_keys=True,
-    )
-
-    source = (ROOT / "dx.py").read_text(
-        encoding="utf-8"
-    )
-    assert "capabilities_command" in source
