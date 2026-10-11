@@ -4,8 +4,21 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dx-artifacts"
-version = "0.0.0"
+version = "0.1.0"
+description = "Deterministic, verifiable workspace artifact tooling"
+readme = "docs/README.md"
+license = {text = "MIT"}
+authors = [{name = "DX Artifacts contributors"}]
 requires-python = ">=3.11"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+
+[project.scripts]
+dx = "dx_artifacts.__main__:console_main"
 
 [project.optional-dependencies]
 test = ["pytest>=8,<9"]

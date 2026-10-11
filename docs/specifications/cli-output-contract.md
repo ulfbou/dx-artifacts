@@ -6,7 +6,7 @@ Accepted and active following WP-10.
 
 ## Command notation
 
-`dx` is canonical contract notation. The current repository entry point is `python dx.py`; console, module, supported-API, and generated standalone distribution forms remain governed by the proposed distribution and integration contract and are not yet implemented interfaces.
+`dx` is the canonical installed command. `python -m dx_artifacts` is the equivalent module form, and `python dx.py` is the generated standalone form. Their distribution boundary is governed by the active distribution and integration contract.
 
 ## 1. Artifact-producing commands
 

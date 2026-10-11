@@ -89,6 +89,15 @@ checks = [
             / "tests/test_wp09_capabilities_cli.py"
         ).is_file(),
     ),
+    (
+        "WP-11 distribution boundary exists",
+        (
+            root / "src/dx_artifacts/__main__.py"
+        ).is_file()
+        and (
+            root / "scripts/validate-wp11.py"
+        ).is_file(),
+    ),
 ]
 
 for name, passed in checks:

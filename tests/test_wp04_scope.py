@@ -42,4 +42,7 @@ def test_wp04_does_not_export_an_envelope_api_yet():
         ROOT / "src/dx_artifacts/__init__.py"
     ).read_text(encoding="utf-8")
 
-    assert "__all__: tuple[str, ...] = ()" in package_source
+    assert "from .api import (" in package_source
+    assert '"build_canonical_envelope"' in package_source
+    assert '"verify_canonical_envelope"' in package_source
+    assert "__all__: tuple[str, ...] = ()" not in package_source

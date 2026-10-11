@@ -19,7 +19,7 @@ def test_current_capabilities_are_immutable_and_complete():
         CAPABILITY_SCHEMA_VERSION
     )
     assert capabilities.tool_name == "dx-artifacts"
-    assert capabilities.software_version == "0.0.0"
+    assert capabilities.software_version == "0.1.0"
     assert capabilities.carrier_read_versions == (
         "v1.3.1",
         "v2.0.0",

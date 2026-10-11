@@ -9,7 +9,7 @@ from typing import Any
 
 CAPABILITY_SCHEMA_VERSION = 1
 TOOL_NAME = "dx-artifacts"
-SOFTWARE_VERSION = "0.0.0"
+SOFTWARE_VERSION = "0.1.0"
 
 CARRIER_READ_VERSIONS = (
     "v1.3.1",

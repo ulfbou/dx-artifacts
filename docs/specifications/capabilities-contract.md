@@ -29,7 +29,7 @@ Array ordering is deterministic.
   "schema_version": 1,
   "tool": {
     "name": "dx-artifacts",
-    "software_version": "0.0.0"
+    "software_version": "0.1.0"
   },
   "carrier": {
     "read_versions": ["v1.3.1", "v2.0.0"],
@@ -63,7 +63,7 @@ Array ordering is deterministic.
 }
 ```
 
-This is the current schema-1 shape. `0.0.0` is the implemented pre-release software identity, not a carrier, envelope, profile, report-schema, or capability-schema version. Those identities remain independent. Implementations report only capabilities they actually provide.
+This is the current schema-1 shape. `0.1.0` is the software release identity, not a carrier, envelope, profile, report-schema, or capability-schema version. Those identities remain independent. Implementations report only capabilities they actually provide.
 
 ## 5. Truthfulness requirement
 

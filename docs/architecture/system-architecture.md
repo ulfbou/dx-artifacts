@@ -454,6 +454,6 @@ Future work must preserve these constraints:
 
 ## 13. Repository and runtime boundary
 
-The current repository executes product behavior through the root `dx.py`, which imports internal modules from `src/dx_artifacts`. The package currently exports no supported Python API, and the repository does not yet provide the WP-11 `dx` console command, `python -m dx_artifacts`, or a generated standalone release artifact. Those distribution forms remain required to originate from one source authority and satisfy applicable observable contracts before advertisement.
+The repository source authority produces the installed `dx` console command, `python -m dx_artifacts`, an explicitly exported Python API, and a generated standalone `dx.py`. WP-11 gates every advertised form against the same applicable observable contracts and records standalone generation provenance, byte size, and SHA-256.
 
 The initial repository state imports an external monolith as bootstrap evidence. Later extraction changes native dependency direction without changing accepted behavior unless a separately accepted change authorizes the difference. Dx.Domain and Collab remain external evidence sources and prospective consumers; they do not participate in native generic product ownership.

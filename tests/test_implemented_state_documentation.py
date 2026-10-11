@@ -63,7 +63,7 @@ REQUIRED_MARKERS = {
     ),
     "docs/specifications/capabilities-contract.md": (
         "Accepted and active following WP-09.",
-        '"software_version": "0.0.0"',
+        '"software_version": "0.1.0"',
         '"artifact_output": {',
     ),
     "docs/specifications/operation-report-contract.md": (

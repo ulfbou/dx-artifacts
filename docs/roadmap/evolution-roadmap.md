@@ -59,6 +59,7 @@ Add explicit operation reports and truthful machine-readable capability discover
 Completed by WP-10. Omitted `-o` selects stdout for artifact-producing commands, while `-o FILE` retains controlled filesystem publication.
 
 ## 12. Stage 9: Consumer-ready distribution
+Active through WP-11 for software release 0.1.0.
 
 Produce versioned installable and standalone forms with release provenance, digests, conformance evidence, and compatibility policy.
 

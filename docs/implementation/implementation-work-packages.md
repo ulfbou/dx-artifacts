@@ -93,7 +93,7 @@ Add truthful `capabilities --json` output that advertises only conformance-gated
 Status: completed. Omitted output for artifact-producing commands is stdout. Explicit `-o FILE` publication remains atomic and symlink-safe.
 
 ## 16. WP-11: Consumer-ready distribution
-
+Status: active implementation for software release 0.1.0.
 ### Scope
 
 - Produce versioned installable and standalone forms from one source identity.
