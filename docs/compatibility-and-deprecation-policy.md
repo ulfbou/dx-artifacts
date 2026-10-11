@@ -2,48 +2,30 @@
 
 ## Status
 
-Accepted for the first consumer-ready DX Artifacts release.
+Accepted for the DX Artifacts 0.1.0 library release under ADR-008.
 
 ## Version domains
 
-Software releases, carrier versions, envelope versions, canonical profiles,
-operation-report schemas, capability schemas, and supported Python API
-versions are independent identities. A software release does not implicitly
-change any artifact-format identity.
+Software releases, carrier versions, envelope versions, canonical profiles, operation-report schemas, capability schemas, and supported Python API versions are independent identities. A software release does not implicitly change an artifact-format identity.
 
 ## Stable interfaces
 
-The installed `dx` command, `python -m dx_artifacts`, the generated standalone
-`dx.py`, and names explicitly exported through `dx_artifacts.__all__` are
-supported interfaces.
+Names explicitly exported through `dx_artifacts.__all__` and documented as supported constitute the 0.1.0 compatibility surface.
 
-Private modules, CLI parser objects, internal classes, spool implementations,
-rendering helpers, exception wiring, and generated standalone internals are
-not supported interfaces.
+Private modules, parser objects, adapter syntax, internal classes, spool implementations, rendering helpers, exception wiring, root `dx.py`, and generated artifacts are not supported interfaces.
+
+`python -m dx_artifacts` is a non-stable reference and conformance adapter. The distribution installs no console command and publishes no supported standalone CLI.
 
 ## Compatibility
 
-Patch releases preserve supported observable behavior and artifact bytes.
-Minor releases may add backward-compatible commands, options, report fields,
-capabilities, or supported API exports. Incompatible CLI, API, schema, carrier,
-envelope, or profile changes require an explicitly versioned boundary.
+Patch releases preserve supported API behavior and established artifact bytes. Minor releases may add backward-compatible supported exports, result fields, formats, or capabilities. Incompatible API, schema, carrier, envelope, or profile changes require an explicitly versioned boundary.
 
-Canonical-profile output must remain byte-identical for identical inputs and
-effective options. An incompatible canonical representation requires a new
-profile identity.
+Canonical-profile output remains byte-identical for identical inputs and effective options. An incompatible canonical representation requires a new profile identity.
 
 ## Deprecation
 
-A supported interface is deprecated before removal. Deprecation documentation
-identifies the affected interface, replacement, first deprecated software
-release, and earliest permitted removal release. Diagnostics must not
-contaminate artifact stdout.
-
-Security or safety defects may require accelerated removal. Such a change must
-be explicit, evidence-backed, and recorded in release notes.
+A supported library interface is deprecated before removal. Deprecation documentation identifies the affected interface, replacement, first deprecated software release, and earliest permitted removal release. Security or safety defects may require accelerated removal with explicit evidence and release documentation.
 
 ## Consumer pinning
 
-Consumers pin a released form by software version and SHA-256, verify its
-provenance, and run consumer-owned integration evidence. Generated standalone
-artifacts are not edited directly.
+Consumers pin a released distribution by software version and artifact identity, verify its provenance, and run consumer-owned integration evidence.

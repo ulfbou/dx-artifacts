@@ -13,8 +13,8 @@ DX Artifacts aims to:
 1. Preserve exact workspace content and established carrier behavior.
 2. Produce deterministic transport representations that recover the original artifact byte-for-byte.
 3. Verify structure, integrity, canonicality, and policy at explicit boundaries.
-4. Support composable command-line workflows without mixing artifacts, diagnostics, and reports.
-5. Publish installable and standalone forms from one authoritative source.
+4. Support composable library operations without mixing artifacts, diagnostics, and reports.
+5. Publish wheel and source distributions from one authoritative package source.
 6. Keep generic product behavior separate from repository-specific orchestration and policy.
 7. Apply represented workspace changes only through explicit, validated operations.
 
@@ -115,17 +115,17 @@ DX is available through versioned product forms originating from one source auth
 
 ### Focus
 
-- Publish an installable command-line product.
-- Support module execution.
+- Publish installable wheel and source distributions.
 - Define a small, explicit Python API.
-- Produce a traceable standalone artifact.
+- Retain module execution only as a non-stable reference adapter.
+- Publish no supported standalone CLI for 0.1.0.
 - Record release provenance, identities, digests, and generation procedures.
 - Apply compatibility and deprecation policies consistently.
 - Verify each advertised product form against applicable contracts.
 
 ### Completion signal
 
-Every advertised distribution form is traceable to one source release and passes its applicable behavior, packaging, provenance, and conformance gates.
+Wheel, source distribution, and supported API are traceable to one source release and pass applicable packaging, provenance, format, API, and conformance gates.
 
 ## Horizon 6: Independent consumer adoption
 

@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted.
+Accepted, partially superseded by ADR-008.
 
 ## Context
 
@@ -10,30 +10,23 @@ Reusable artifact behavior must be importable without making CLI parsing, render
 
 ## Decision
 
-DX Artifacts is an importable Python package and a command-line product. The package owns reusable artifact behavior. The CLI owns process adaptation. The entry point alone converts a returned status into process termination.
+The package owns reusable artifact behavior. Process adapters own argument parsing, rendering, and exit mapping. An adapter entry point alone may convert a returned status into process termination.
 
-```text
-Repository       ulfbou/dx-artifacts
-Distribution     dx-artifacts
-Import package   dx_artifacts
-Console command  dx
-Module command   python -m dx_artifacts
-```
+Consumers must not depend on `argparse.Namespace`, internal parser classes, private module paths, concrete spool implementations, internal exception wiring, or rendering helpers.
 
-Supported interface levels are a stable CLI contract, a small explicitly exported Python API, and internal implementation modules.
-
-Consumers must not depend on `argparse.Namespace`, internal parser classes, private module paths, concrete spool implementations, internal exception wiring, or CLI rendering helpers.
+ADR-008 supersedes the earlier decision that DX Artifacts is also a command-line product. It also supersedes the installed `dx` command, stable module-command status, and stable CLI interface level. `python -m dx_artifacts` is now a non-stable reference and conformance adapter.
 
 ## Consequences
 
-- Core behavior can be reused by consumers and all command forms.
+- Core behavior can be reused without process adaptation.
 - Public API growth is deliberate and reviewable.
-- CLI compatibility and Python API compatibility can be governed explicitly.
-- Internal decomposition remains changeable behind observable contracts.
+- Internal decomposition remains changeable behind supported library contracts.
+- Adapter behavior can provide integration evidence without becoming library API.
 
 ## Verification obligations
 
-- Console and module entry points run the same orchestration.
 - Supported API exports are enumerated and tested.
-- Process termination occurs only at entry-point boundaries.
+- Reusable operations neither render process output nor terminate the process.
+- Process termination occurs only at adapter boundaries.
 - Consumer evidence imports only supported exports.
+- The reference adapter delegates to package behavior and does not become a second implementation authority.
