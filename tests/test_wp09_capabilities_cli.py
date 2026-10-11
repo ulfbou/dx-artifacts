@@ -11,7 +11,7 @@ EXPECTED = {
     "schema_version": 1,
     "tool": {
         "name": "dx-artifacts",
-        "software_version": "0.0.0",
+        "software_version": "0.1.0",
     },
     "carrier": {
         "read_versions": [

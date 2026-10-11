@@ -2,7 +2,8 @@
 
 ## Status
 
-Proposed product-boundary contract. It changes no carrier or envelope grammar.
+Accepted and active following WP-11. It changes no carrier or envelope
+grammar.
 
 ## Native supported forms
 

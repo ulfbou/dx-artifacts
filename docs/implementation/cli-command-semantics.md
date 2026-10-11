@@ -6,7 +6,7 @@ Accepted contract. Stdout-default behavior is active following WP-10.
 
 ## Command notation
 
-The currently implemented repository entry point is `python dx.py`. The `dx` console command, `python -m dx_artifacts`, a supported Python API, and a generated standalone release artifact remain WP-11 distribution forms and are not current interfaces. Command examples use `dx` as contract notation for the future canonical product command unless a current invocation is being demonstrated.
+Following WP-11, `dx` is the canonical installed command. `python -m dx_artifacts` is the equivalent module form, explicitly exported names in `dx_artifacts` form the supported Python API, and the generated standalone release artifact runs as `python dx.py`. All forms originate from the same source authority.
 
 ## 1. Normalization
 

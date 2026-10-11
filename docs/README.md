@@ -114,3 +114,4 @@ No documentation statement alone proves implementation behavior. Capabilities be
 - Roadmaps sequence work without activating capabilities.
 - Bootstrap preserves observed carrier behavior and existing CLI defaults.
 - Stdout-default behavior is active following WP-10. Envelope behavior is supported only where its separately defined implementation and conformance boundaries have passed.
+- WP-11 supplies the versioned installed CLI, module command, explicit Python API, and traceable generated standalone form for software release 0.1.0.
