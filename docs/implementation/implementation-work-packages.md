@@ -13,7 +13,7 @@ Every work package must preserve established carrier semantics unless its scope 
 ### Scope
 
 - Establish DX Artifacts project metadata and controlling documentation.
-- Establish native repository, distribution, package, console, module, and standalone identities.
+- Establish native repository, library distribution, package, reference-adapter, and future-application identities.
 - Record external provenance and future consumer boundaries.
 - Add no implementation or envelope behavior.
 
@@ -92,19 +92,21 @@ Add truthful `capabilities --json` output that advertises only conformance-gated
 
 Status: completed. Omitted output for artifact-producing commands is stdout. Explicit `-o FILE` publication remains atomic and symlink-safe.
 
-## 16. WP-11: Consumer-ready distribution
-Status: active implementation for software release 0.1.0.
+## 16. Historical WP-11: superseded consumer-ready distribution plan
+Status: superseded by ADR-008 and the DX Artifacts 0.1.0 library-release milestone.
 ### Scope
 
-- Produce versioned installable and standalone forms from one source identity.
-- Record release provenance, generation procedure, digests, and conformance results.
-- Prove console, module, supported API, and standalone behavior where applicable.
+- Produce versioned wheel and source distributions from one package authority.
+- Record release provenance, artifact identities, and conformance results.
+- Prove the supported Python API and preserved DX format behavior from installed distributions.
+- Retain module execution only as a non-stable reference adapter.
+- Install no console command and publish no supported standalone CLI.
 - Publish compatibility and deprecation policy required for consumer adoption.
 
 ### Acceptance
 
-- Each advertised form passes its applicable gate.
-- The standalone artifact is mechanically traceable to the source release.
+- Wheel, source distribution, and supported API pass their applicable gates.
+- No console or standalone CLI is advertised as a 0.1.0 product form.
 - Release identities remain separate from carrier, envelope, profile, and schema identities.
 
 ## 17. WP-12: External consumer adoption

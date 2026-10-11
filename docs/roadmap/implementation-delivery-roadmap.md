@@ -24,9 +24,9 @@ Includes WP-04. Exit evidence covers parsing, integrity, unsafe archives, resour
 
 Includes WP-05. Exit evidence proves repeated canonical production, golden bytes, self-verification, and exact unwrap.
 
-## 7. CLI boundary
+## 7. Adapter integration boundary
 
-Includes WP-06 and WP-07. Exit evidence proves native console, module, and applicable standalone orchestration plus equality of integrated and explicit pipelines.
+Includes WP-06 and WP-07. Exit evidence preserves adapter integration and equality of applicable integrated and explicit pipelines without defining a stable CLI product.
 
 ## 8. Automation boundary
 
@@ -38,7 +38,7 @@ Completed by WP-10. Stdout is the omitted-output default for artifact-producing 
 
 ## 10. Consumer-ready release boundary
 
-Includes WP-11. Exit evidence proves versioned distributions from one source identity, release provenance, digests, generation procedure, supported-interface conformance, and compatibility policy.
+Includes WP-11. Exit evidence proves wheel and source distributions from one package authority, release provenance, supported API and format conformance, metadata, and compatibility policy.
 
 ## 11. External consumer boundary
 
@@ -52,7 +52,7 @@ Repository bootstrap
 → Foundation
 → Envelope read
 → Envelope write
-→ CLI
+→ Adapter integration
 → Automation
 → Compatibility activation
 → Consumer-ready release

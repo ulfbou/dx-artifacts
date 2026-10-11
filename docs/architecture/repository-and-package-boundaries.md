@@ -5,60 +5,53 @@
 The `ulfbou/dx-artifacts` repository owns:
 
 - DX carrier and envelope specifications;
-- the Python implementation;
+- the Python library implementation;
 - the supported Python API;
-- command-line behavior;
 - format and profile conformance;
-- compatibility and deprecation policy;
+- compatibility and deprecation policy for the library;
 - fixtures and golden artifacts;
 - release evidence;
-- installable and standalone distributions.
+- wheel and source distributions.
 
 These are native DX Artifacts concerns, not responsibilities delegated to source or consumer repositories.
 
 ## Product identities
 
 ```text
-Repository       ulfbou/dx-artifacts
-Distribution     dx-artifacts
-Import package   dx_artifacts
-Console command  dx
-Module command   python -m dx_artifacts
-Standalone form  python dx.py
+Repository          ulfbou/dx-artifacts
+Library product     DX Artifacts
+Distribution        dx-artifacts
+Import package      dx_artifacts
+Reference adapter   python -m dx_artifacts
+Future application  DXS
 ```
 
-The console, module, supported API, and standalone forms originate from one source authority and must satisfy the same applicable observable contracts.
+The reference adapter is non-stable. Release 0.1.0 installs no console command and publishes no supported standalone CLI.
 
 ## Interface levels
 
-1. Stable CLI contract.
-2. Small, explicitly exported Python API.
-3. Internal implementation modules.
+1. Small, explicitly exported Python API.
+2. Internal implementation modules.
+3. Non-stable reference and conformance adapters.
 
-Consumers must not depend on `argparse.Namespace`, internal parser classes, private module paths, concrete spool implementations, internal exception wiring, or CLI rendering helpers.
+Consumers must not depend on `argparse.Namespace`, parser classes, private module paths, spool implementations, exception wiring, rendering helpers, or adapter syntax.
 
-The package owns reusable artifact behavior. CLI adapters own process argument parsing, rendering, and exit mapping. Only an entry point converts a returned status into process termination.
+The package owns reusable artifact behavior. Adapters own process argument parsing, rendering, and exit mapping. Only an adapter entry point may convert a returned status into process termination.
 
 ## External repository relationships
 
 ### Dx.Domain
 
-Dx.Domain is an external source of bootstrap implementation and release-gate evidence. After a consumer-ready DX Artifacts release exists, Dx.Domain may adopt a pinned installed or standalone distribution.
-
-Dx.Domain continues to own release-gate orchestration, evidence selection, feedback dossier semantics, handoff policy, gate-result reporting, and consumer integration tests.
+Dx.Domain is an external source of bootstrap implementation and release-gate evidence. After a DX Artifacts library release exists, Dx.Domain may adopt a pinned library distribution behind repository-specific orchestration.
 
 ### Collab
 
-Collab is an external source of compatibility evidence. After a consumer-ready release exists, Collab may adopt that release behind collaboration-specific adapters where required.
-
-Collab continues to own collaboration orchestration, selection and evidence policy, supported historical command adapters, and consumer integration tests.
+Collab is an external source of compatibility evidence. After a DX Artifacts library release exists, Collab may adopt that release behind collaboration-specific adapters.
 
 ### pystd-suite
 
 pystd-suite is related but independently governed. It neither owns nor supplies DX runtime code.
 
-## Vendoring boundary
+## Future DXS boundary
 
-A future consumer may carry a standalone `dx.py` generated from a DX Artifacts release when repository-local availability is required. The consumer records the upstream software version, source release identity, SHA-256, acquisition or generation procedure, and consumer integration evidence.
-
-The vendored artifact is not edited directly. Generic changes are made in DX Artifacts and consumed through a later release.
+DXS is reserved for a separately governed future CLI application. It may depend on `dx-artifacts` and own command names, help, configuration, exit mapping, shell behavior, and CLI compatibility. This repository does not publish DXS in release 0.1.0.

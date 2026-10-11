@@ -2,43 +2,39 @@
 
 ## Status
 
-Accepted and active following WP-11. It changes no carrier or envelope
-grammar.
+Accepted under ADR-008 for the DX Artifacts 0.1.0 library release. It changes no carrier or envelope grammar.
 
-## Native supported forms
+## Supported product forms
 
 ```text
-Installed CLI
-    dx ...
-Module execution
-    python -m dx_artifacts ...
+Wheel distribution
+    Installable dx-artifacts library.
+
+Source distribution
+    Buildable dx-artifacts library source distribution.
+
 Supported Python API
     import dx_artifacts
-Standalone release artifact
-    python dx.py ...
 ```
 
-All supported forms are produced by DX Artifacts from one source authority. A form is advertised only after applicable conformance passes.
+Each advertised form is produced from one package source authority and must pass applicable packaging, API, format, provenance, and conformance gates.
 
-## Command notation
+## Excluded product forms
 
-DX Artifacts documentation uses `dx` as the canonical product command once the console distribution is available.
+Release 0.1.0:
 
-`python -m dx_artifacts` is the equivalent module form. `python dx.py` identifies the standalone release artifact. References to a source repository's historical `dx.py` are explicitly labeled as bootstrap or provenance references rather than product command notation.
+- installs no `dx` console command;
+- installs no `dxs` console command;
+- publishes no standalone CLI as a supported product form;
+- does not treat `python -m dx_artifacts` as a stable interface.
+
+Module execution may remain as a non-stable reference and conformance adapter. DXS is reserved for a separate future CLI application.
 
 ## Interface stability
 
-The CLI is the broad interoperability boundary. The Python API is small and explicitly exported. Other modules and classes are internal.
+The supported Python API is small and explicitly exported. Other modules and classes are internal. Consumers must not depend on CLI parser objects, private modules, internal parser classes, concrete spool implementations, internal exception wiring, or rendering helpers.
 
-Consumers must not depend on CLI parser objects, private modules, internal parser classes, concrete spool implementations, internal exception wiring, or rendering helpers.
-
-Reusable package operations return typed values, results, or statuses. Only process entry points translate status into process termination.
-
-## Standalone artifact
-
-The standalone `dx.py` is generated or assembled from the same released source identity as the package and CLI. Its release evidence records software version, source release identity, SHA-256, generation procedure, and applicable conformance results.
-
-A consumer pins and verifies the artifact and must not edit it directly.
+Reusable package operations return values, immutable results, or typed failures. They do not render process output or terminate a process.
 
 ## Independent identities
 
@@ -49,8 +45,8 @@ A consumer pins and verifies the artifact and must not edit it directly.
 - operation and verification report schema versions;
 - capability schema version.
 
-A software refactor or package release does not change a format declaration merely because the software version changed.
+A library refactor or package release does not change a format declaration merely because the software version changed.
 
-## Consumer-ready release
+## Release readiness
 
-A release is consumer-ready only when its advertised distribution forms pass applicable behavior, packaging, provenance, and conformance gates. Consumer-specific orchestration remains outside DX Artifacts and is verified by the relevant consumer repository.
+A release is ready only when wheel and source distribution, supported API, carrier and envelope preservation, metadata, documentation, and evidence gates pass. Consumer-specific orchestration remains outside DX Artifacts and is verified by the relevant consumer.

@@ -10,7 +10,8 @@ DX Artifacts evolves from imported, evidenced carrier behavior toward the artifa
 New repository authority
 → accepted baseline preservation
 → external compatibility classification
-→ package boundary
+→ library product boundary
+→ explicit API boundary
 → behavior-preserving decomposition
 → envelope read
 → envelope write
@@ -36,7 +37,7 @@ Evaluate applicable Collab evidence against the accepted baseline, classify ever
 
 ## 6. Stage 3: Package boundary and decomposition
 
-Establish the `dx_artifacts` package, `dx` CLI adapter, module entry point, internal dependency direction, spooling, sinks, and typed verification without changing accepted behavior.
+Establish the `dx_artifacts` package, explicit supported API, non-stable reference adapter, internal dependency direction, spooling, sinks, and typed verification without changing established artifact behavior.
 
 ## 7. Stage 4: Envelope read
 
@@ -61,7 +62,7 @@ Completed by WP-10. Omitted `-o` selects stdout for artifact-producing commands,
 ## 12. Stage 9: Consumer-ready distribution
 Active through WP-11 for software release 0.1.0.
 
-Produce versioned installable and standalone forms with release provenance, digests, conformance evidence, and compatibility policy.
+Produce versioned wheel and source distributions with release provenance, API and format conformance evidence, and compatibility policy. Install no console command and publish no supported standalone CLI.
 
 ## 13. Stage 10: External consumer adoption
 
